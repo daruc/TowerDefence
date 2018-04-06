@@ -59,6 +59,7 @@ public class Bullet {
     public void reset() {
         target = null;
         position = new PointF(towerPosition.x, towerPosition.y);
+        free = true;
     }
 
     public boolean collision() {
@@ -75,5 +76,9 @@ public class Bullet {
 
     public int getDamage() {
         return damage;
+    }
+
+    public void setDamage(int damage)  {
+        this.damage = damage;
     }
 }

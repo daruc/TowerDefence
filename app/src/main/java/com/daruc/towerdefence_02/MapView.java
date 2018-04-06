@@ -30,7 +30,7 @@ public class MapView extends View {
     private GameMap gameMap;
     private Paint paint = new Paint();
     private int tileSize = 150;
-    private int gold = 10;
+    private int gold = 15;
 
     private MediaPlayer mediaPlayer;
     private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -109,9 +109,9 @@ public class MapView extends View {
                 } else if (gameMap.getBuilding(positionX, positionY) == null &&
                         gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
 
-                    if (gold >= 30) {
+                    if (gold >= 100) {
                         gameMap.removeForest(positionX, positionY);
-                        setGold(gold - 30);
+                        setGold(gold - 100);
                     }
                 }
                 return true;
@@ -287,6 +287,7 @@ public class MapView extends View {
                 canvas.drawCircle(position.x, position.y, radius, paintCastle);
             } else {
                 Tower tower = (Tower) building;
+                radius = tower.getRadius() * tileSize;
                 canvas.drawCircle(position.x, position.y, radius, paintTower);
                 float scope = tower.getScope() * tileSize;
                 if (building == selectedBuilding) {
@@ -299,6 +300,8 @@ public class MapView extends View {
 
     private void drawBullets(Canvas canvas, Tower tower) {
         for (Bullet bullet : tower.getBullets()) {
+            if (bullet.isFree()) continue;
+
             PointF position = Vectors.copy(bullet.getPosition());
             position.x *= tileSize;
             position.y *= tileSize;
@@ -356,5 +359,9 @@ public class MapView extends View {
 
     public void nextWave() {
         gameMap.nextWave();
+    }
+
+    public Building getSelectedBuilding() {
+        return selectedBuilding;
     }
 }

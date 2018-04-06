@@ -21,10 +21,10 @@ public class GameMap {
     private List<Enemy> enemies = new ArrayList<>();
     private List<Building> buildingsList = new ArrayList<>();
     private PointF mapDimensions;
-    private int nEnemies = 5;
+    private int nEnemies = 3;
 
     private int wave = 1;
-    private int health = 10;
+    private int health = 5;
     private float speed = 1f;
 
     public GameMap(InputStream mapResource) {
@@ -244,6 +244,7 @@ public class GameMap {
         nEnemies += 1;
         health += 15;
         speed += 0.1f;
+        enemies.clear();
         addEnemies(nEnemies, health, speed);
     }
 

@@ -12,8 +12,10 @@ import java.util.List;
 public class Tower extends Building {
     private List<Bullet> bullets = new ArrayList<>(1);
     private int maxBullets = 1;
-    private float scopeRadius = 2f;  // in map units
+    private float scopeRadius = 1.5f;  // in map units
+    private float radius = 0.25f;
     private List<Enemy> enemies = new ArrayList<>();
+    private int level = 1;
 
     public Tower(PointF coordinates) {
         super(coordinates);
@@ -52,5 +54,22 @@ public class Tower extends Building {
 
     public List<Enemy> getEnemies() {
         return enemies;
+    }
+
+    public void upgrade() {
+        ++level;
+        if (level <= 3){
+            radius += 0.1f;
+
+            bullets.add(new Bullet(position));
+            for (Bullet bullet : bullets) {
+                bullet.setDamage(bullet.getDamage() + 1);
+            }
+        }
+        scopeRadius += 0.5f;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }
