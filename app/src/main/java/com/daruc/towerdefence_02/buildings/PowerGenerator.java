@@ -1,4 +1,4 @@
-package com.daruc.towerdefence_02;
+package com.daruc.towerdefence_02.buildings;
 
 import android.graphics.PointF;
 
@@ -6,8 +6,8 @@ import android.graphics.PointF;
  * Created by darek on 06.04.18.
  */
 
-public class SquareTower extends Building {
-    public SquareTower(PointF position) {
+public class PowerGenerator extends Building{
+    public PowerGenerator(PointF position) {
         super(position);
     }
 
@@ -17,6 +17,6 @@ public class SquareTower extends Building {
     }
 
     public static int getCost() {
-        return 200;
+        return 30;
     }
 }

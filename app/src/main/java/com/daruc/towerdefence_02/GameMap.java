@@ -3,6 +3,13 @@ package com.daruc.towerdefence_02;
 import android.graphics.Point;
 import android.graphics.PointF;
 
+import com.daruc.towerdefence_02.buildings.Building;
+import com.daruc.towerdefence_02.buildings.Castle;
+import com.daruc.towerdefence_02.buildings.PowerGenerator;
+import com.daruc.towerdefence_02.buildings.PowerReceiver;
+import com.daruc.towerdefence_02.buildings.SquareTower;
+import com.daruc.towerdefence_02.buildings.Tower;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +173,7 @@ public class GameMap {
                 return new Point(0, i);
             }
 
-            if (getGround(getWidth()-1, i) == GroundType.PATH) {
+            if (getGround(getWidth() - 1, i) == GroundType.PATH) {
                 return new Point(getWidth()-1, i);
             }
         }
@@ -176,8 +183,8 @@ public class GameMap {
                 return new Point(i, 0);
             }
 
-            if (getGround(i, getHeight()-1) == GroundType.PATH) {
-                return new Point (i, getHeight()-1);
+            if (getGround(i, getHeight() - 1) == GroundType.PATH) {
+                return new Point (i, getHeight() - 1);
             }
         }
         throw new IllegalStateException("Map doesn't have path origin.");
@@ -192,17 +199,49 @@ public class GameMap {
             SquareTower squareTower = new SquareTower(new PointF(x + 0.5f, y + 0.5f));
             buildings[y][x] = squareTower;
             buildingsList.add(squareTower);
+
+            PowerGenerator powerGenerator = findPowerGenerator(x, y);
+            squareTower.setPowerGenerator(powerGenerator);
             return squareTower;
         }
         return null;
     }
 
-    public ForceGenerator buildForceGenerator(int x, int y) {
+    public PowerGenerator buildPowerGenerator(int x, int y) {
         if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            ForceGenerator generator = new ForceGenerator(new PointF(x + 0.5f, y + 0.5f));
+            PowerGenerator generator = new PowerGenerator(new PointF(x + 0.5f, y + 0.5f));
             buildings[y][x] = generator;
             buildingsList.add(generator);
+            connectPowerGenerator(x, y);
             return generator;
+        }
+        return null;
+    }
+
+    private void connectPowerGenerator(int generatorX, int generatorY) {
+
+        for (int x = -1; x < 2; ++x) {
+            for (int y = -1; y < 2; ++y) {
+
+                if (buildings[generatorY + y][generatorX + x] instanceof PowerReceiver) {
+                    PowerReceiver powerReceiver =
+                            (PowerReceiver) buildings[generatorY + y][generatorX + x];
+                    
+                    powerReceiver.
+                            setPowerGenerator((PowerGenerator) buildings[generatorY][generatorX]);
+                }
+            }
+        }
+    }
+
+    private PowerGenerator findPowerGenerator(int buildingX, int buildingY) {
+        for (int x = -1; x < 2; ++x) {
+            for (int y = -1; y < 2; ++y) {
+
+                if (buildings[buildingY + y][buildingX + x] instanceof PowerGenerator) {
+                    return (PowerGenerator) buildings[buildingY + y][buildingX + x];
+                }
+            }
         }
         return null;
     }
@@ -212,6 +251,9 @@ public class GameMap {
             Tower tower = new Tower(new PointF(x + 0.5f, y + 0.5f));
             buildings[y][x] = tower;
             buildingsList.add(tower);
+
+            PowerGenerator powerGenerator = findPowerGenerator(x, y);
+            tower.setPowerGenerator(powerGenerator);
             return tower;
         }
         return null;
@@ -240,8 +282,25 @@ public class GameMap {
     public boolean removeBuilding(int x, int y) {
         boolean result = (buildings[y][x] != null);
         buildingsList.remove(buildings[y][x]);
+
+        if (buildings[y][x] instanceof PowerGenerator) {
+            disconnectPowerGenerator(x, y); // fix it
+        }
         buildings[y][x] = null;
         return result;
+    }
+
+    private void disconnectPowerGenerator(int generatorX, int generatorY) {
+
+        for (int y = -1; y < 2; ++y) {
+            for (int x = -1; x < 2; ++x) {
+
+                if (buildings[generatorY + y][generatorX + x] instanceof PowerReceiver) {
+                    PowerReceiver powerReceiver = (PowerReceiver) buildings[generatorY + y][generatorX + x];
+                    powerReceiver.setPowerGenerator(null);
+                }
+            }
+        }
     }
 
     public boolean removeForest(int x, int y) {

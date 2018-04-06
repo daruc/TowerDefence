@@ -13,11 +13,17 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.daruc.towerdefence_02.buildings.Building;
+import com.daruc.towerdefence_02.buildings.Bullet;
+import com.daruc.towerdefence_02.buildings.Castle;
+import com.daruc.towerdefence_02.buildings.PowerGenerator;
+import com.daruc.towerdefence_02.buildings.Rocket;
+import com.daruc.towerdefence_02.buildings.SquareTower;
+import com.daruc.towerdefence_02.buildings.Tower;
 
 import java.io.InputStream;
 
@@ -53,6 +59,7 @@ public class MapView extends View {
     private Paint paintTowerRange;
     private Paint paintSquareTowerRange;
     private Paint paintBullet;
+    private Paint paintRocket;
 
     private Bitmap grassBitmap;
     private Bitmap waterBitmap;
@@ -99,8 +106,8 @@ public class MapView extends View {
                         }
                     }
                 } else if (buildingSelectionIdx == 2) {
-                    if (gold >= ForceGenerator.getCost()) {
-                        ForceGenerator generator = gameMap.buildForceGenerator(positionX, positionY);
+                    if (gold >= PowerGenerator.getCost()) {
+                        PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
                         if (generator != null) {
                             setGold(gold - generator.getCost());
                         }
@@ -133,10 +140,10 @@ public class MapView extends View {
                         gameMap.removeBuilding(positionX, positionY);
                         setGold(gold - SquareTower.getCost() / 2);
                     }
-                } else if (gameMap.getBuilding(positionX, positionY) instanceof ForceGenerator) {
-                    if (gold >= ForceGenerator.getCost() / 2) {
+                } else if (gameMap.getBuilding(positionX, positionY) instanceof PowerGenerator) {
+                    if (gold >= PowerGenerator.getCost() / 2) {
                         gameMap.removeBuilding(positionX, positionY);
-                        setGold(gold - ForceGenerator.getCost());
+                        setGold(gold - PowerGenerator.getCost());
                     }
                 } else if (gameMap.getBuilding(positionX, positionY) == null &&
                         gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
@@ -170,6 +177,10 @@ public class MapView extends View {
         paintBullet = new Paint();
         paintBullet.setStyle(Paint.Style.FILL);
         paintBullet.setColor(Color.DKGRAY);
+
+        paintRocket = new Paint();
+        paintRocket.setStyle(Paint.Style.FILL);
+        paintRocket.setColor(Color.RED);
 
         paintTower = new Paint();
         paintTower.setColor(Color.BLUE);
@@ -357,8 +368,9 @@ public class MapView extends View {
                     canvas.drawLine(0f, position.y, getWidth(), position.y, paintSquareTowerRange);
                     canvas.drawLine(position.x, 0f, position.x, getHeight(), paintSquareTowerRange);
                 }
+                drawRockets(canvas, (SquareTower) building);
 
-            } else if (building instanceof ForceGenerator) {
+            } else if (building instanceof PowerGenerator) {
                 canvas.drawCircle(position.x, position.y, tileSize / 2 - 10, paintForceGenerator);
 
                 if (building == selectedBuilding) {
@@ -386,6 +398,18 @@ public class MapView extends View {
             canvas.drawCircle(position.x, position.y, 10f, paintBullet);
         }
 
+    }
+
+    private void drawRockets(Canvas canvas, SquareTower squareTower) {
+        for (Rocket rocket : squareTower.getRockets()) {
+            if (rocket.isFree()) continue;
+
+            PointF position = Vectors.copy(rocket.getPosition());
+            position.x *= tileSize;
+            position.y *= tileSize;
+
+            canvas.drawCircle(position.x, position.y, 15f, paintRocket);
+        }
     }
 
     public void restartGame(Context context) {

@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.daruc.towerdefence_02.buildings.Tower;
+
 /**
  * Created by darek on 02.04.18.
  */

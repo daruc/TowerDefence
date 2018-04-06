@@ -1,6 +1,10 @@
-package com.daruc.towerdefence_02;
+package com.daruc.towerdefence_02.buildings;
 
 import android.graphics.PointF;
+
+import com.daruc.towerdefence_02.Enemy;
+import com.daruc.towerdefence_02.GameMap;
+import com.daruc.towerdefence_02.Vectors;
 
 /**
  * Created by darek on 04.04.18.

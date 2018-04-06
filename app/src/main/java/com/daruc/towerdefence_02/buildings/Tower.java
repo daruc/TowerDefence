@@ -1,6 +1,9 @@
-package com.daruc.towerdefence_02;
+package com.daruc.towerdefence_02.buildings;
 
 import android.graphics.PointF;
+
+import com.daruc.towerdefence_02.Enemy;
+import com.daruc.towerdefence_02.Vectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,7 @@ import java.util.List;
  * Created by darek on 04.04.18.
  */
 
-public class Tower extends Building {
+public class Tower extends Building implements PowerReceiver {
     private List<Bullet> bullets = new ArrayList<>(1);
     private int maxBullets = 1;
     private float scopeRadius = 1.5f;  // in map units
@@ -18,6 +21,7 @@ public class Tower extends Building {
     private int level = 1;
     private float frequency = 0f;
     private long lastShotTime = -2000;
+    private PowerGenerator powerGenerator;
 
     public Tower(PointF coordinates) {
         super(coordinates);
@@ -82,5 +86,15 @@ public class Tower extends Building {
     public boolean isReady() {
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastShotTime) / 1000f >= frequency;
+    }
+
+    @Override
+    public boolean withPowerGenerator() {
+        return powerGenerator != null;
+    }
+
+    @Override
+    public void setPowerGenerator(PowerGenerator powerGenerator) {
+        this.powerGenerator = powerGenerator;
     }
 }

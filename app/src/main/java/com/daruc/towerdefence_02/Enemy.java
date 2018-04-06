@@ -3,6 +3,8 @@ package com.daruc.towerdefence_02;
 import android.graphics.Point;
 import android.graphics.PointF;
 
+import com.daruc.towerdefence_02.buildings.Castle;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

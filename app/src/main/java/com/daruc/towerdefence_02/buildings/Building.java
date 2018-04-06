@@ -1,4 +1,4 @@
-package com.daruc.towerdefence_02;
+package com.daruc.towerdefence_02.buildings;
 
 import android.graphics.PointF;
 
