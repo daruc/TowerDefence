@@ -21,6 +21,11 @@ public class GameMap {
     private List<Enemy> enemies = new ArrayList<>();
     private List<Building> buildingsList = new ArrayList<>();
     private PointF mapDimensions;
+    private int nEnemies = 5;
+
+    private int wave = 1;
+    private int health = 10;
+    private float speed = 1f;
 
     public GameMap(InputStream mapResource) {
         loadFromFile(mapResource);
@@ -83,7 +88,7 @@ public class GameMap {
 
     private void addEnemies() {
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < nEnemies; ++i) {
             enemies.add(new Enemy(enemiesPath, i));
         }
     }
@@ -180,14 +185,14 @@ public class GameMap {
         return enemies;
     }
 
-    public boolean buildTower(int x, int y) {
+    public Tower buildTower(int x, int y) {
         if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
             Tower tower = new Tower(new PointF(x + 0.5f, y + 0.5f));
             buildings[y][x] = tower;
             buildingsList.add(tower);
-            return true;
+            return tower;
         }
-        return false;
+        return null;
     }
 
     public Building getBuilding(int x, int y) {
@@ -210,8 +215,45 @@ public class GameMap {
         return null;
     }
 
-    public void removeBuilding(int x, int y) {
+    public boolean removeBuilding(int x, int y) {
+        boolean result = (buildings[y][x] != null);
         buildingsList.remove(buildings[y][x]);
         buildings[y][x] = null;
+        return result;
+    }
+
+    public boolean removeForest(int x, int y) {
+        if (groundTiles[y][x] == GroundType.FOREST) {
+            groundTiles[y][x] = GroundType.GRASS;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean enemiesDead() {
+        for (Enemy enemy: enemies) {
+            if (enemy.isActive()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void nextWave() {
+        nEnemies += 1;
+        health += 15;
+        speed += 0.1f;
+        addEnemies(nEnemies, health, speed);
+    }
+
+    private void addEnemies(int number, int health, float speed) {
+        for (int i = 0; i < number; ++i) {
+            float waitingTime = i * (1f / speed);
+            Enemy enemy = new Enemy(enemiesPath, waitingTime);
+            enemy.setHealth(health);
+            enemy.setSpeed(speed);
+            enemies.add(enemy);
+        }
     }
 }

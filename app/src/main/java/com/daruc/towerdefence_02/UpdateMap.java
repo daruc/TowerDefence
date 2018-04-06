@@ -45,6 +45,12 @@ public class UpdateMap implements Runnable {
             }
         }
 
+        if (!gameMap.getEnemies().isEmpty() && gameMap.enemiesDead()) {
+            Toast.makeText(context, "Victory", Toast.LENGTH_LONG).show();
+            gameMap.getEnemies().clear();
+            //gameMap.nextWave();
+        }
+
         for (Building building : gameMap.getBuildings()) {
             if (building instanceof Tower) {
                 Tower tower = (Tower) building;
@@ -59,6 +65,10 @@ public class UpdateMap implements Runnable {
                         Enemy target = bullet.getTarget();
                         target.decreaseHealth(bullet.getDamage());
                         soundPool.play(soundId, 1, 1, 1, 0, 1.0f);
+
+                        if (target.isDead()) {
+                            mapView.setGold(mapView.getGold() + 5);
+                        }
                         bullet.reset();
                     }
 

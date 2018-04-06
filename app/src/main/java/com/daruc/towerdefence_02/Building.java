@@ -8,7 +8,7 @@ import android.graphics.PointF;
 
 public class Building {
     protected PointF position;
-    public int getCost() {
+    public static int getCost() {
         return 0;
     }
 

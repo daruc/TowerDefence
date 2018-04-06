@@ -23,9 +23,8 @@ public class Tower extends Building {
         }
     }
 
-    @Override
-    public int getCost() {
-        return 100;
+    public static int getCost() {
+        return 10;
     }
 
     public void findEnemies(List<Enemy> allEnemies) {

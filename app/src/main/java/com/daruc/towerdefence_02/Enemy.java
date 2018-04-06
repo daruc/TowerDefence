@@ -15,11 +15,11 @@ public class Enemy {
     private PointF position;
     private Iterator<PointF> nextPositionIt;
     private PointF nextPosition;
-    private float speed = 0.4f;
+    private float speed = 1f;
     private List<PointF> enemiesPath;
     private float waitingTimeSec;
     private float radius = 0.1f;
-    private int health = 100;
+    private int health = 10;
 
     public Enemy(List<Point> pEnemiesPath) {
         this(pEnemiesPath, 0f);
@@ -120,5 +120,17 @@ public class Enemy {
         PointF castlePosition = castle.getPosition();
         float distance = Vectors.distance(position, castlePosition);
         return (distance < castleRadius);
+    }
+
+    public boolean isDead() {
+        return health <= 0;
+    }
+
+    public void setHealth(int hp) {
+        health = hp;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 }

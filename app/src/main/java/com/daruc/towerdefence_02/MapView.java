@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.InputStream;
@@ -29,6 +30,7 @@ public class MapView extends View {
     private GameMap gameMap;
     private Paint paint = new Paint();
     private int tileSize = 150;
+    private int gold = 10;
 
     private MediaPlayer mediaPlayer;
     private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -75,7 +77,14 @@ public class MapView extends View {
             public void onClick(View v) {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
-                gameMap.buildTower(positionX, positionY);
+
+                if (gold >= Tower.getCost()) {
+                    Tower tower = gameMap.buildTower(positionX, positionY);
+                    if (tower != null) {
+                        setGold(gold - tower.getCost());
+                    }
+                }
+
 
                 Building newSelectedBuilding = gameMap.getBuilding(positionX, positionY);
                 if (newSelectedBuilding == selectedBuilding) {
@@ -91,7 +100,20 @@ public class MapView extends View {
             public boolean onLongClick(View v) {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
-                gameMap.removeBuilding(positionX, positionY);
+
+                if (gameMap.getBuilding(positionX, positionY) instanceof Tower) {
+                    if (gold >= Tower.getCost() / 2) {
+                        gameMap.removeBuilding(positionX, positionY);
+                        setGold(gold - Tower.getCost() / 2);
+                    }
+                } else if (gameMap.getBuilding(positionX, positionY) == null &&
+                        gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
+
+                    if (gold >= 30) {
+                        gameMap.removeForest(positionX, positionY);
+                        setGold(gold - 30);
+                    }
+                }
                 return true;
             }
         });
@@ -289,6 +311,9 @@ public class MapView extends View {
     public void restartGame(Context context) {
         InputStream mapResource = context.getResources().openRawResource(R.raw.map_1);
         gameMap = new GameMap(mapResource);
+        gold = 10;
+        refreshGoldView();
+
         updateMap.stop();
         updateMap = new UpdateMap(this);
         updateMap.run();
@@ -308,5 +333,28 @@ public class MapView extends View {
 
     public Handler getHandler() {
         return handler;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public void setGold(int gold) {
+        if (gold < 0) {
+            this.gold = 0;
+        } else {
+            this.gold = gold;
+        }
+        refreshGoldView();
+    }
+
+    private void refreshGoldView() {
+        GameView gameView = (GameView) getParent();
+        TextView goldView = gameView.getGoldView();
+        goldView.setText("Gold: " + String.valueOf(gold));
+    }
+
+    public void nextWave() {
+        gameMap.nextWave();
     }
 }
