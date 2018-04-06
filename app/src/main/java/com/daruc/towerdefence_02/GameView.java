@@ -1,7 +1,11 @@
 package com.daruc.towerdefence_02;
 
+import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,6 +21,7 @@ public class GameView extends ViewGroup {
     private TextView goldView;
     private Button nextWaveButton;
     private Button upgradeButton;
+    private Button buildingsButton;
 
 
     public GameView(final Context context) {
@@ -25,6 +30,7 @@ public class GameView extends ViewGroup {
         restartButton = new Button(context);
         nextWaveButton = new Button(context);
         upgradeButton = new Button(context);
+        buildingsButton = new Button(context);
         goldView = new TextView(context);
         mapView = new MapView(context);
         restartButton.setText("Restart");
@@ -58,6 +64,36 @@ public class GameView extends ViewGroup {
             }
         });
 
+        buildingsButton.setText("Buildings");
+        buildingsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Instantiate an AlertDialog.Builder with its constructor
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                // 2. Chain together various setter methods to set the dialog characteristics
+                builder.setTitle("Buildings");
+
+                final String strBuildings[] = {
+                        "Round Tower",
+                        "Square Tower",
+                        "Force Generator"
+                };
+                builder.setSingleChoiceItems(strBuildings, mapView.getBuildingSelectionIdx(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d("Building selection", strBuildings[which]);
+                        mapView.setBuildingSelectionIndex(which);
+                    }
+                });
+
+                // 3. Get the AlertDialog from create()
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
 
         int gold = mapView.getGold();
         goldView.setText("Gold: " + gold);
@@ -65,6 +101,7 @@ public class GameView extends ViewGroup {
         addView(restartButton);
         addView(nextWaveButton);
         addView(upgradeButton);
+        addView(buildingsButton);
         addView(goldView);
         addView(mapView);
     }
@@ -76,10 +113,11 @@ public class GameView extends ViewGroup {
             getChildAt(i).layout(l, t, r, b);
 
         }
-        restartButton.layout(0, b - 150, 250, b);
-        nextWaveButton.layout(270, b - 150, 500, b);
-        upgradeButton.layout(520, b - 150, 800, b);
-        goldView.layout(r - 240, b - 150, r, b);
+        restartButton.layout(0, b - 170, 200, b);
+        nextWaveButton.layout(210, b - 170, 400, b);
+        upgradeButton.layout(410, b - 170, 600, b);
+        buildingsButton.layout(610, b - 170, 790, b);
+        goldView.layout(r - 240, b - 170, r, b);
     }
 
     @Override

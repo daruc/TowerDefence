@@ -187,6 +187,26 @@ public class GameMap {
         return enemies;
     }
 
+    public SquareTower buildSquareTower(int x, int y) {
+        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
+            SquareTower squareTower = new SquareTower(new PointF(x + 0.5f, y + 0.5f));
+            buildings[y][x] = squareTower;
+            buildingsList.add(squareTower);
+            return squareTower;
+        }
+        return null;
+    }
+
+    public ForceGenerator buildForceGenerator(int x, int y) {
+        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
+            ForceGenerator generator = new ForceGenerator(new PointF(x + 0.5f, y + 0.5f));
+            buildings[y][x] = generator;
+            buildingsList.add(generator);
+            return generator;
+        }
+        return null;
+    }
+
     public Tower buildTower(int x, int y) {
         if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
             Tower tower = new Tower(new PointF(x + 0.5f, y + 0.5f));

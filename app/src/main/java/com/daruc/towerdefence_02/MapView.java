@@ -30,7 +30,7 @@ public class MapView extends View {
     private GameMap gameMap;
     private Paint paint = new Paint();
     private int tileSize = 150;
-    private int gold = 15;
+    private int gold = 1_000_000;
 
     private MediaPlayer mediaPlayer;
     private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -47,6 +47,8 @@ public class MapView extends View {
     private Paint paintEnemy;
     private Paint paintTower;
     private Paint paintCastle;
+    private Paint paintSquareTower;
+    private Paint paintForceGenerator;
     private Paint paintTowerRange;
     private Paint paintBullet;
 
@@ -55,6 +57,8 @@ public class MapView extends View {
     private Bitmap forestBitmap;
     private Bitmap pathBitmap;
     private Bitmap stoneBitmap;
+
+    private int buildingSelectionIdx = 0;
 
     public MapView(Context context) {
         super(context);
@@ -78,10 +82,26 @@ public class MapView extends View {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
 
-                if (gold >= Tower.getCost()) {
-                    Tower tower = gameMap.buildTower(positionX, positionY);
-                    if (tower != null) {
-                        setGold(gold - tower.getCost());
+                if (buildingSelectionIdx == 0) {
+                    if (gold >= Tower.getCost()) {
+                        Tower tower = gameMap.buildTower(positionX, positionY);
+                        if (tower != null) {
+                            setGold(gold - tower.getCost());
+                        }
+                    }
+                } else if (buildingSelectionIdx == 1) {
+                    if (gold >= SquareTower.getCost()) {
+                        SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
+                        if (squareTower != null) {
+                            setGold(gold - squareTower.getCost());
+                        }
+                    }
+                } else if (buildingSelectionIdx == 2) {
+                    if (gold >= ForceGenerator.getCost()) {
+                        ForceGenerator generator = gameMap.buildForceGenerator(positionX, positionY);
+                        if (generator != null) {
+                            setGold(gold - generator.getCost());
+                        }
                     }
                 }
 
@@ -105,6 +125,16 @@ public class MapView extends View {
                     if (gold >= Tower.getCost() / 2) {
                         gameMap.removeBuilding(positionX, positionY);
                         setGold(gold - Tower.getCost() / 2);
+                    }
+                } else if (gameMap.getBuilding(positionX, positionY) instanceof SquareTower) {
+                    if (gold >= SquareTower.getCost() /  2) {
+                        gameMap.removeBuilding(positionX, positionY);
+                        setGold(gold - SquareTower.getCost() / 2);
+                    }
+                } else if (gameMap.getBuilding(positionX, positionY) instanceof ForceGenerator) {
+                    if (gold >= ForceGenerator.getCost() / 2) {
+                        gameMap.removeBuilding(positionX, positionY);
+                        setGold(gold - ForceGenerator.getCost());
                     }
                 } else if (gameMap.getBuilding(positionX, positionY) == null &&
                         gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
@@ -151,6 +181,14 @@ public class MapView extends View {
         paintCastle = new Paint();
         paintCastle.setStyle(Paint.Style.FILL);
         paintCastle.setColor(Color.LTGRAY);
+
+        paintSquareTower = new Paint();
+        paintSquareTower.setStyle(Paint.Style.FILL);
+        paintSquareTower.setColor(Color.RED);
+
+        paintForceGenerator = new Paint();
+        paintForceGenerator.setStyle(Paint.Style.FILL);
+        paintForceGenerator.setColor(Color.CYAN);
 
         grassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
         pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.path);
@@ -285,7 +323,8 @@ public class MapView extends View {
             if (building instanceof Castle) {
                 radius = ((Castle) building).getRadius() * tileSize;
                 canvas.drawCircle(position.x, position.y, radius, paintCastle);
-            } else {
+
+            } else if (building instanceof Tower) {
                 Tower tower = (Tower) building;
                 radius = tower.getRadius() * tileSize;
                 canvas.drawCircle(position.x, position.y, radius, paintTower);
@@ -294,6 +333,17 @@ public class MapView extends View {
                     canvas.drawCircle(position.x, position.y, scope, paintTowerRange);
                 }
                 drawBullets(canvas, tower);
+
+            } else if (building instanceof SquareTower) {
+                RectF rect = new RectF();
+                rect.left = position.x - (tileSize / 2) + 10f;
+                rect.right = position.x + (tileSize / 2) - 10f;
+                rect.top = position.y - (tileSize / 2) + 10f;
+                rect.bottom = position.y + (tileSize / 2) - 10f;
+                canvas.drawRect(rect, paint);
+
+            } else if (building instanceof ForceGenerator) {
+                canvas.drawCircle(position.x, position.y, tileSize / 2 - 10, paintForceGenerator);
             }
         }
     }
@@ -314,7 +364,7 @@ public class MapView extends View {
     public void restartGame(Context context) {
         InputStream mapResource = context.getResources().openRawResource(R.raw.map_1);
         gameMap = new GameMap(mapResource);
-        gold = 10;
+        gold = 1_000_000;
         refreshGoldView();
 
         updateMap.stop();
@@ -363,5 +413,13 @@ public class MapView extends View {
 
     public Building getSelectedBuilding() {
         return selectedBuilding;
+    }
+
+    public void setBuildingSelectionIndex(int index) {
+        buildingSelectionIdx = index;
+    }
+
+    public int getBuildingSelectionIdx() {
+        return buildingSelectionIdx;
     }
 }
