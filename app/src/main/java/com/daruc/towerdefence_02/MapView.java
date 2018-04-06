@@ -49,7 +49,9 @@ public class MapView extends View {
     private Paint paintCastle;
     private Paint paintSquareTower;
     private Paint paintForceGenerator;
+    private Paint paintForceGeneratorRange;
     private Paint paintTowerRange;
+    private Paint paintSquareTowerRange;
     private Paint paintBullet;
 
     private Bitmap grassBitmap;
@@ -175,8 +177,8 @@ public class MapView extends View {
 
         paintTowerRange = new Paint();
         paintTowerRange.setStyle(Paint.Style.STROKE);
-        paintTowerRange.setStrokeWidth(4f);
-        paintTowerRange.setColor(Color.argb(170, 160, 160, 160));
+        paintTowerRange.setStrokeWidth(5f);
+        paintTowerRange.setColor(Color.argb(170, 160, 160, 200));
 
         paintCastle = new Paint();
         paintCastle.setStyle(Paint.Style.FILL);
@@ -186,9 +188,18 @@ public class MapView extends View {
         paintSquareTower.setStyle(Paint.Style.FILL);
         paintSquareTower.setColor(Color.RED);
 
+        paintSquareTowerRange = new Paint();
+        paintSquareTowerRange.setStyle(Paint.Style.STROKE);
+        paintSquareTowerRange.setStrokeWidth(5f);
+        paintSquareTowerRange.setColor(Color.argb(170, 200, 160, 160));
+
         paintForceGenerator = new Paint();
         paintForceGenerator.setStyle(Paint.Style.FILL);
         paintForceGenerator.setColor(Color.CYAN);
+
+        paintForceGeneratorRange = new Paint();
+        paintForceGeneratorRange.setStyle(Paint.Style.STROKE);
+        paintForceGeneratorRange.setColor(Color.CYAN);
 
         grassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
         pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.path);
@@ -342,8 +353,24 @@ public class MapView extends View {
                 rect.bottom = position.y + (tileSize / 2) - 10f;
                 canvas.drawRect(rect, paint);
 
+                if (building == selectedBuilding) {
+                    canvas.drawLine(0f, position.y, getWidth(), position.y, paintSquareTowerRange);
+                    canvas.drawLine(position.x, 0f, position.x, getHeight(), paintSquareTowerRange);
+                }
+
             } else if (building instanceof ForceGenerator) {
                 canvas.drawCircle(position.x, position.y, tileSize / 2 - 10, paintForceGenerator);
+
+                if (building == selectedBuilding) {
+                    PointF mapPosition = building.getPosition();
+                    RectF rect = new RectF();
+                    rect.left = (mapPosition.x - 1.5f) * tileSize;
+                    rect.right = (mapPosition.x + 1.5f) * tileSize;
+                    rect.top = (mapPosition.y - 1.5f) * tileSize;
+                    rect.bottom = (mapPosition.y + 1.5f) * tileSize;
+                    canvas.drawRect(rect, paintForceGeneratorRange);
+                }
+
             }
         }
     }

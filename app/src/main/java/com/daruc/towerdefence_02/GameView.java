@@ -1,7 +1,6 @@
 package com.daruc.towerdefence_02;
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
@@ -64,7 +63,7 @@ public class GameView extends ViewGroup {
             }
         });
 
-        buildingsButton.setText("Buildings");
+        buildingsButton.setText("Round Tower");
         buildingsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,6 +83,7 @@ public class GameView extends ViewGroup {
                     public void onClick(DialogInterface dialog, int which) {
                         Log.d("Building selection", strBuildings[which]);
                         mapView.setBuildingSelectionIndex(which);
+                        buildingsButton.setText(strBuildings[which]);
                     }
                 });
 
