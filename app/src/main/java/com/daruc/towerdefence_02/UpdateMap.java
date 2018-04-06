@@ -51,13 +51,18 @@ public class UpdateMap implements Runnable {
             //gameMap.nextWave();
         }
 
+        long time = System.currentTimeMillis();
         for (Building building : gameMap.getBuildings()) {
             if (building instanceof Tower) {
                 Tower tower = (Tower) building;
+
                 tower.findEnemies(gameMap.getEnemies());
                 for (Bullet bullet : tower.getBullets()) {
-                    if (!bullet.hasTarget() && tower.hasEnemies()) {
+                    if (bullet.isFree() && !bullet.hasTarget() && tower.hasEnemies() && tower.isReady()) {
                         bullet.setTarget(tower.getEnemies().get(0));
+                        tower.setLastShotTime(time);
+                    } else if (bullet.hasTarget() && bullet.getTarget().isDead()) {
+                        bullet.reset();
                     }
                     bullet.move(refreshTime);
 

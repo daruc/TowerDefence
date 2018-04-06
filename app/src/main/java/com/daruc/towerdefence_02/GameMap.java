@@ -89,7 +89,9 @@ public class GameMap {
     private void addEnemies() {
 
         for (int i = 0; i < nEnemies; ++i) {
-            enemies.add(new Enemy(enemiesPath, i));
+            float waitingTime = i * (0.7f / speed);
+            Enemy enemy = new Enemy(enemiesPath, waitingTime);
+            enemies.add(enemy);
         }
     }
 
@@ -242,7 +244,7 @@ public class GameMap {
 
     public void nextWave() {
         nEnemies += 1;
-        health += 15;
+        health += 3;
         speed += 0.1f;
         enemies.clear();
         addEnemies(nEnemies, health, speed);
@@ -250,7 +252,7 @@ public class GameMap {
 
     private void addEnemies(int number, int health, float speed) {
         for (int i = 0; i < number; ++i) {
-            float waitingTime = i * (1f / speed);
+            float waitingTime = i * (0.7f / speed);
             Enemy enemy = new Enemy(enemiesPath, waitingTime);
             enemy.setHealth(health);
             enemy.setSpeed(speed);

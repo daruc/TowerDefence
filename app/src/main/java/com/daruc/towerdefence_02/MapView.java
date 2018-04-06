@@ -109,7 +109,7 @@ public class MapView extends View {
                 } else if (gameMap.getBuilding(positionX, positionY) == null &&
                         gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
 
-                    if (gold >= 100) {
+                    if (gold >= 10) {
                         gameMap.removeForest(positionX, positionY);
                         setGold(gold - 100);
                     }

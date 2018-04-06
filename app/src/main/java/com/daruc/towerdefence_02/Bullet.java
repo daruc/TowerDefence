@@ -9,10 +9,11 @@ import android.graphics.PointF;
 public class Bullet {
     private PointF towerPosition;
     private PointF position;
-    private float speed = 7f;   // map units per second
+    private float speed = 4f;   // map units per second
     private Enemy target;
     private boolean free = true;
     private int damage = 1;
+    private PointF direction;
 
     public Bullet(PointF position) {
         towerPosition = position;
@@ -26,15 +27,21 @@ public class Bullet {
     public void move(float deltaTimeMillis) {
 
         if (hasTarget()) {
-            PointF direction = Vectors.unitVector(position, target.getPosition());
+            direction = Vectors.unitVector(position, target.getPosition());
 
             float replacement = (deltaTimeMillis / 1000) * speed;
-            direction.x *= replacement;
-            direction.y *= replacement;
 
-            position.x += direction.x;
-            position.y += direction.y;
+            position.x += direction.x * replacement;
+            position.y += direction.y * replacement;
+        } else if (!free) {
+            moveStraight(deltaTimeMillis);
         }
+    }
+
+    public void moveStraight(float deltaTimeMillis) {
+        float replacement = (deltaTimeMillis / 1000) * speed;
+        position.x += direction.x * replacement;
+        position.y += direction.y * replacement;
     }
 
     public void setTarget(Enemy enemy) {

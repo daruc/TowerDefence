@@ -16,6 +16,8 @@ public class Tower extends Building {
     private float radius = 0.25f;
     private List<Enemy> enemies = new ArrayList<>();
     private int level = 1;
+    private float frequency = 0f;
+    private long lastShotTime = -2000;
 
     public Tower(PointF coordinates) {
         super(coordinates);
@@ -71,5 +73,14 @@ public class Tower extends Building {
 
     public float getRadius() {
         return radius;
+    }
+
+    public void setLastShotTime(long lastShotTime) {
+        this.lastShotTime = lastShotTime;
+    }
+
+    public boolean isReady() {
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - lastShotTime) / 1000f >= frequency;
     }
 }
