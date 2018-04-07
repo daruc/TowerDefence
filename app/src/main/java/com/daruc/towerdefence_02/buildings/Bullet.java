@@ -11,13 +11,14 @@ import com.daruc.towerdefence_02.Vectors;
  */
 
 public class Bullet {
-    private PointF towerPosition;
     private PointF position;
-    private float speed = 4f;   // map units per second
+    private final PointF towerPosition;
+    private PointF direction;
     private Enemy target;
     private boolean free = true;
+
     private int damage = 1;
-    private PointF direction;
+    private float speed = 4f;   // map units per second
 
     public Bullet(PointF position) {
         towerPosition = position;
@@ -28,24 +29,24 @@ public class Bullet {
         return position;
     }
 
-    public void move(float deltaTimeMillis) {
+    public void move(long deltaTimeMillis) {
 
         if (hasTarget()) {
             direction = Vectors.unitVector(position, target.getPosition());
 
-            float replacement = (deltaTimeMillis / 1000) * speed;
+            float displacement = ((float) deltaTimeMillis / 1000) * speed;
 
-            position.x += direction.x * replacement;
-            position.y += direction.y * replacement;
+            position.x += direction.x * displacement;
+            position.y += direction.y * displacement;
         } else if (!free) {
             moveStraight(deltaTimeMillis);
         }
     }
 
-    public void moveStraight(float deltaTimeMillis) {
-        float replacement = (deltaTimeMillis / 1000) * speed;
-        position.x += direction.x * replacement;
-        position.y += direction.y * replacement;
+    public void moveStraight(long deltaTimeMillis) {
+        float displacement = (deltaTimeMillis / 1000) * speed;
+        position.x += direction.x * displacement;
+        position.y += direction.y * displacement;
     }
 
     public void setTarget(Enemy enemy) {
@@ -91,5 +92,13 @@ public class Bullet {
 
     public void setDamage(int damage)  {
         this.damage = damage;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 }

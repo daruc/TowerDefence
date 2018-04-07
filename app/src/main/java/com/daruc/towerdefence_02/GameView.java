@@ -10,19 +10,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.daruc.towerdefence_02.buildings.Tower;
+import com.daruc.towerdefence_02.buildings.RoundTower;
 
 /**
  * Created by darek on 02.04.18.
  */
 
 public class GameView extends ViewGroup {
-    private Button restartButton;
     private MapView mapView;
-    private TextView goldView;
+    private Button restartButton;
     private Button nextWaveButton;
     private Button upgradeButton;
     private Button buildingsButton;
+    private TextView goldView;
 
 
     public GameView(final Context context) {
@@ -54,18 +54,19 @@ public class GameView extends ViewGroup {
         upgradeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tower tower = (Tower) mapView.getSelectedBuilding();
-                if (tower != null) {
+                RoundTower roundTower = (RoundTower) mapView.getSelectedBuilding();
+                if (roundTower != null) {
                     int gold = mapView.getGold();
                     if (gold >= 50) {
-                        tower.upgrade();
-                        mapView.setGold(gold - 50);
+                        if (roundTower.upgrade()) {
+                            mapView.setGold(gold - 50);
+                        }
                     }
                 }
             }
         });
 
-        buildingsButton.setText("Round Tower");
+        buildingsButton.setText("Round RoundTower");
         buildingsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,8 +77,8 @@ public class GameView extends ViewGroup {
                 builder.setTitle("Buildings");
 
                 final String strBuildings[] = {
-                        "Round Tower",
-                        "Square Tower",
+                        "Round RoundTower",
+                        "Square RoundTower",
                         "Force Generator"
                 };
                 builder.setSingleChoiceItems(strBuildings, mapView.getBuildingSelectionIdx(), new DialogInterface.OnClickListener() {

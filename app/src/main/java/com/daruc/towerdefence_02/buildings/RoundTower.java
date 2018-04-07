@@ -12,7 +12,11 @@ import java.util.List;
  * Created by darek on 04.04.18.
  */
 
-public class Tower extends Building implements PowerReceiver {
+public class RoundTower extends Building implements PowerReceiver, Upgradable {
+
+    private static final int MAX_LEVEL = 1000;
+    public static final int COST = 10;
+
     private List<Bullet> bullets = new ArrayList<>(1);
     private int maxBullets = 1;
     private float scopeRadius = 1.5f;  // in map units
@@ -23,7 +27,7 @@ public class Tower extends Building implements PowerReceiver {
     private long lastShotTime = -2000;
     private PowerGenerator powerGenerator;
 
-    public Tower(PointF coordinates) {
+    public RoundTower(PointF coordinates) {
         super(coordinates);
         position = new PointF(coordinates.x, coordinates.y);
         for (int i = 0; i < maxBullets; ++i) {
@@ -31,8 +35,8 @@ public class Tower extends Building implements PowerReceiver {
         }
     }
 
-    public static int getCost() {
-        return 10;
+    public int getCost() {
+        return COST;
     }
 
     public void findEnemies(List<Enemy> allEnemies) {
@@ -62,7 +66,11 @@ public class Tower extends Building implements PowerReceiver {
         return enemies;
     }
 
-    public void upgrade() {
+    @Override
+    public boolean upgrade() {
+        if (getLevel() >= getMaxLevel()) {
+            return false;
+        }
         ++level;
         if (level <= 3){
             radius += 0.1f;
@@ -73,6 +81,17 @@ public class Tower extends Building implements PowerReceiver {
             }
         }
         scopeRadius += 0.5f;
+        return true;
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return MAX_LEVEL;
     }
 
     public float getRadius() {

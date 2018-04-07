@@ -9,8 +9,8 @@ import android.widget.Toast;
 import com.daruc.towerdefence_02.buildings.Building;
 import com.daruc.towerdefence_02.buildings.Bullet;
 import com.daruc.towerdefence_02.buildings.Rocket;
+import com.daruc.towerdefence_02.buildings.RoundTower;
 import com.daruc.towerdefence_02.buildings.SquareTower;
-import com.daruc.towerdefence_02.buildings.Tower;
 
 /**
  * Created by darek on 05.04.18.
@@ -59,8 +59,8 @@ public class UpdateMap implements Runnable {
 
         long time = System.currentTimeMillis();
         for (Building building : gameMap.getBuildings()) {
-            if (building instanceof Tower) {
-                updateTower(time, (Tower) building);
+            if (building instanceof RoundTower) {
+                updateTower(time, (RoundTower) building);
             } else if (building instanceof SquareTower) {
                 updateSquareTower(time, (SquareTower) building);
             }
@@ -71,12 +71,12 @@ public class UpdateMap implements Runnable {
         }
     }
 
-    private void updateTower(long time, Tower tower) {
-        tower.findEnemies(gameMap.getEnemies());
-        for (Bullet bullet : tower.getBullets()) {
-            if (bullet.isFree() && !bullet.hasTarget() && tower.hasEnemies() && tower.isReady()) {
-                bullet.setTarget(tower.getEnemies().get(0));
-                tower.setLastShotTime(time);
+    private void updateTower(long time, RoundTower roundTower) {
+        roundTower.findEnemies(gameMap.getEnemies());
+        for (Bullet bullet : roundTower.getBullets()) {
+            if (bullet.isFree() && !bullet.hasTarget() && roundTower.hasEnemies() && roundTower.isReady()) {
+                bullet.setTarget(roundTower.getEnemies().get(0));
+                roundTower.setLastShotTime(time);
             } else if (bullet.hasTarget() && bullet.getTarget().isDead()) {
                 bullet.reset();
             }

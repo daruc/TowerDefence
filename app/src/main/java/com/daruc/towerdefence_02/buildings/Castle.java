@@ -8,11 +8,18 @@ import android.graphics.PointF;
 
 public class Castle extends Building {
     private float radius = 0.45f;
-    private int health = 3;
+
+    private final int maxHealth = 3;
+    private int health = maxHealth;
 
     public Castle(PointF position) {
         super(position);
         this.position = new PointF(position.x, position.y);
+    }
+
+    @Override
+    public int getCost() {
+        return 0;
     }
 
     public float getRadius() {
@@ -24,6 +31,8 @@ public class Castle extends Building {
     }
 
     public void decreaseHealth(int hp) {
-        health -= hp;
+        if (health > 0) {
+            health -= hp;
+        }
     }
 }

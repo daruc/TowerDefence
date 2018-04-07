@@ -17,10 +17,12 @@ public class Enemy {
     private PointF position;
     private Iterator<PointF> nextPositionIt;
     private PointF nextPosition;
-    private float speed = 1f;
+
     private List<PointF> enemiesPath;
     private float waitingTimeSec;
+
     private float radius = 0.1f;
+    private float speed = 1f;
     private int health = 10;
 
     public Enemy(List<Point> pEnemiesPath) {
@@ -114,7 +116,7 @@ public class Enemy {
     }
 
     public boolean isActive() {
-        return health > 0;
+        return health > 0;  // fix it
     }
 
     public boolean castleCollision(Castle castle) {

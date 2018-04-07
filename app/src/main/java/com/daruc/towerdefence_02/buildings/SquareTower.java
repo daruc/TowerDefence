@@ -17,9 +17,32 @@ import static com.daruc.towerdefence_02.Direction.UP;
  * Created by darek on 06.04.18.
  */
 
-public class SquareTower extends Building implements PowerReceiver {
+public class SquareTower extends Building implements PowerReceiver, Upgradable {
+    private static final int MAX_LEVEL = 1000;
+    public static final int COST = 200;
+
+    private int level = 1;
     private List<Rocket> rockets;
     private PowerGenerator powerGenerator;
+
+    @Override
+    public boolean upgrade() {
+        if (getLevel() < getMaxLevel()) {
+            ++level;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return MAX_LEVEL;
+    }
 
     public SquareTower(PointF position) {
         super(position);
@@ -53,8 +76,9 @@ public class SquareTower extends Building implements PowerReceiver {
         return super.getPosition();
     }
 
-    public static int getCost() {
-        return 200;
+    @Override
+    public int getCost() {
+        return COST;
     }
 
     public List<Rocket> getRockets() {

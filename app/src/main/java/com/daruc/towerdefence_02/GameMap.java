@@ -8,7 +8,7 @@ import com.daruc.towerdefence_02.buildings.Castle;
 import com.daruc.towerdefence_02.buildings.PowerGenerator;
 import com.daruc.towerdefence_02.buildings.PowerReceiver;
 import com.daruc.towerdefence_02.buildings.SquareTower;
-import com.daruc.towerdefence_02.buildings.Tower;
+import com.daruc.towerdefence_02.buildings.RoundTower;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,13 +24,14 @@ import java.util.regex.Pattern;
 public class GameMap {
     private GroundType[][] groundTiles;
     private Building[][] buildings;
+
     private List<Point> enemiesPath;
     private List<Enemy> enemies = new ArrayList<>();
     private List<Building> buildingsList = new ArrayList<>();
     private PointF mapDimensions;
-    private int nEnemies = 3;
 
     private int wave = 1;
+    private int nEnemies = 3;
     private int health = 5;
     private float speed = 1f;
 
@@ -73,54 +74,6 @@ public class GameMap {
         }
 
         mapDimensions = new PointF(width, height);
-    }
-
-    private void initBuildings() {
-        buildings = new Building[getHeight()][];
-        for (int i = 0; i < getHeight(); ++i) {
-            buildings[i] = new Building[getWidth()];
-        }
-
-        // find castle
-        for (int h = 0; h < getHeight(); ++h) {
-            for (int w = 0; w < getWidth(); ++w) {
-                if (groundTiles[h][w] == GroundType.CASTLE) {
-                    buildings[h][w] = new Castle(new PointF(w + 0.5f, h + 0.5f));
-                    buildingsList.add(buildings[h][w]);
-                    return;
-                }
-            }
-        }
-    }
-
-    private void addEnemies() {
-
-        for (int i = 0; i < nEnemies; ++i) {
-            float waitingTime = i * (0.7f / speed);
-            Enemy enemy = new Enemy(enemiesPath, waitingTime);
-            enemies.add(enemy);
-        }
-    }
-
-    public GroundType getGround(int x, int y) {
-        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) return GroundType.STONE;
-        return groundTiles[y][x];
-    }
-
-    public GroundType getGround(Point point) {
-        return getGround(point.x, point.y);
-    }
-
-    public int getHeight() {
-        return groundTiles.length;
-    }
-
-    public int getWidth() {
-        return groundTiles[0].length;
-    }
-
-    public PointF mapDimensions() {
-        return mapDimensions;
     }
 
     private void computeEnemiesPath() {
@@ -190,6 +143,60 @@ public class GameMap {
         throw new IllegalStateException("Map doesn't have path origin.");
     }
 
+    private void addEnemies() {
+
+        for (int i = 0; i < nEnemies; ++i) {
+            float waitingTime = i * (0.7f / speed);
+            Enemy enemy = new Enemy(enemiesPath, waitingTime);
+            enemies.add(enemy);
+        }
+    }
+
+    private void initBuildings() {
+        buildings = new Building[getHeight()][];
+        for (int i = 0; i < getHeight(); ++i) {
+            buildings[i] = new Building[getWidth()];
+        }
+
+        // find castle
+        for (int h = 0; h < getHeight(); ++h) {
+            for (int w = 0; w < getWidth(); ++w) {
+                if (groundTiles[h][w] == GroundType.CASTLE) {
+                    buildings[h][w] = new Castle(new PointF(w + 0.5f, h + 0.5f));
+                    buildingsList.add(buildings[h][w]);
+                    return;
+                }
+            }
+        }
+    }
+
+
+
+    public GroundType getGround(int x, int y) {
+        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) return GroundType.STONE;
+        return groundTiles[y][x];
+    }
+
+    public GroundType getGround(Point point) {
+        return getGround(point.x, point.y);
+    }
+
+    public int getHeight() {
+        return groundTiles.length;
+    }
+
+    public int getWidth() {
+        return groundTiles[0].length;
+    }
+
+    public PointF mapDimensions() {
+        return mapDimensions;
+    }
+
+
+
+
+
     public List<Enemy> getEnemies() {
         return enemies;
     }
@@ -222,6 +229,12 @@ public class GameMap {
 
         for (int x = -1; x < 2; ++x) {
             for (int y = -1; y < 2; ++y) {
+                int receiverX = generatorX + x;
+                int receiverY = generatorY + y;
+
+                if (isOutOfTiles(receiverX, receiverY)) {
+                    continue;
+                }
 
                 if (buildings[generatorY + y][generatorX + x] instanceof PowerReceiver) {
                     PowerReceiver powerReceiver =
@@ -235,26 +248,40 @@ public class GameMap {
     }
 
     private PowerGenerator findPowerGenerator(int buildingX, int buildingY) {
+
+        int generatorX, generatorY;
+
         for (int x = -1; x < 2; ++x) {
             for (int y = -1; y < 2; ++y) {
+                generatorX = buildingX + x;
+                generatorY = buildingY + y;
 
-                if (buildings[buildingY + y][buildingX + x] instanceof PowerGenerator) {
-                    return (PowerGenerator) buildings[buildingY + y][buildingX + x];
+                if (isOutOfTiles(generatorX, generatorY)) {
+                    continue;
+                }
+
+                if (buildings[generatorY][generatorX] instanceof PowerGenerator) {
+                    return (PowerGenerator) buildings[generatorY][generatorX];
                 }
             }
         }
         return null;
     }
 
-    public Tower buildTower(int x, int y) {
+    private boolean isOutOfTiles(int x, int y) {
+        return (x < 0 || x >= getWidth() ||
+                y < 0 || y >= getHeight());
+    }
+
+    public RoundTower buildRoundTower(int x, int y) {
         if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            Tower tower = new Tower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = tower;
-            buildingsList.add(tower);
+            RoundTower roundTower = new RoundTower(new PointF(x + 0.5f, y + 0.5f));
+            buildings[y][x] = roundTower;
+            buildingsList.add(roundTower);
 
             PowerGenerator powerGenerator = findPowerGenerator(x, y);
-            tower.setPowerGenerator(powerGenerator);
-            return tower;
+            roundTower.setPowerGenerator(powerGenerator);
+            return roundTower;
         }
         return null;
     }
@@ -294,6 +321,13 @@ public class GameMap {
 
         for (int y = -1; y < 2; ++y) {
             for (int x = -1; x < 2; ++x) {
+
+                int receiverX = generatorX + x;
+                int receiverY = generatorY + y;
+
+                if (isOutOfTiles(receiverX, receiverY)) {
+                    continue;
+                }
 
                 if (buildings[generatorY + y][generatorX + x] instanceof PowerReceiver) {
                     PowerReceiver powerReceiver = (PowerReceiver) buildings[generatorY + y][generatorX + x];

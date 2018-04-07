@@ -22,8 +22,8 @@ import com.daruc.towerdefence_02.buildings.Bullet;
 import com.daruc.towerdefence_02.buildings.Castle;
 import com.daruc.towerdefence_02.buildings.PowerGenerator;
 import com.daruc.towerdefence_02.buildings.Rocket;
+import com.daruc.towerdefence_02.buildings.RoundTower;
 import com.daruc.towerdefence_02.buildings.SquareTower;
-import com.daruc.towerdefence_02.buildings.Tower;
 
 import java.io.InputStream;
 
@@ -68,6 +68,23 @@ public class MapView extends View {
     private Bitmap stoneBitmap;
 
     private int buildingSelectionIdx = 0;
+    private enum BuildingSelection {
+        ROUND_TOWER(0), SQUARE_TOWER(1), POWER_GENERATOR(2);
+
+        int index;
+        BuildingSelection(int idx)  {
+            index = idx;
+        }
+
+        public static BuildingSelection fromIndex(int idx) {
+            for (BuildingSelection buildingSelection : values()) {
+                if (buildingSelection.index == idx) {
+                    return buildingSelection;
+                }
+            }
+            return null;
+        }
+    }
 
     public MapView(Context context) {
         super(context);
@@ -91,29 +108,35 @@ public class MapView extends View {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
 
-                if (buildingSelectionIdx == 0) {
-                    if (gold >= Tower.getCost()) {
-                        Tower tower = gameMap.buildTower(positionX, positionY);
-                        if (tower != null) {
-                            setGold(gold - tower.getCost());
-                        }
-                    }
-                } else if (buildingSelectionIdx == 1) {
-                    if (gold >= SquareTower.getCost()) {
-                        SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
-                        if (squareTower != null) {
-                            setGold(gold - squareTower.getCost());
-                        }
-                    }
-                } else if (buildingSelectionIdx == 2) {
-                    if (gold >= PowerGenerator.getCost()) {
-                        PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
-                        if (generator != null) {
-                            setGold(gold - generator.getCost());
-                        }
-                    }
-                }
+                switch (BuildingSelection.fromIndex(buildingSelectionIdx)) {
 
+                    case ROUND_TOWER:
+                        if (gold >= RoundTower.COST) {
+                            RoundTower roundTower = gameMap.buildRoundTower(positionX, positionY);
+                            if (roundTower != null) {
+                                setGold(gold - roundTower.getCost());
+                            }
+                        }
+                        break;
+
+                    case SQUARE_TOWER:
+                        if (gold >= SquareTower.COST) {
+                            SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
+                            if (squareTower != null) {
+                                setGold(gold - squareTower.getCost());
+                            }
+                        }
+                        break;
+
+                    case POWER_GENERATOR:
+                        if (gold >= PowerGenerator.COST) {
+                            PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
+                            if (generator != null) {
+                                setGold(gold - generator.getCost());
+                            }
+                        }
+                        break;
+                }
 
                 Building newSelectedBuilding = gameMap.getBuilding(positionX, positionY);
                 if (newSelectedBuilding == selectedBuilding) {
@@ -130,25 +153,17 @@ public class MapView extends View {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
 
-                if (gameMap.getBuilding(positionX, positionY) instanceof Tower) {
-                    if (gold >= Tower.getCost() / 2) {
+                Building building = gameMap.getBuilding(positionX, positionY);
+                if (building != null && !(building instanceof Castle)) {
+                    int cost = building.getCost() / 2;
+                    if (gold >= cost) {
                         gameMap.removeBuilding(positionX, positionY);
-                        setGold(gold - Tower.getCost() / 2);
+                        setGold(gold - cost);
                     }
-                } else if (gameMap.getBuilding(positionX, positionY) instanceof SquareTower) {
-                    if (gold >= SquareTower.getCost() /  2) {
-                        gameMap.removeBuilding(positionX, positionY);
-                        setGold(gold - SquareTower.getCost() / 2);
-                    }
-                } else if (gameMap.getBuilding(positionX, positionY) instanceof PowerGenerator) {
-                    if (gold >= PowerGenerator.getCost() / 2) {
-                        gameMap.removeBuilding(positionX, positionY);
-                        setGold(gold - PowerGenerator.getCost());
-                    }
-                } else if (gameMap.getBuilding(positionX, positionY) == null &&
+                } else if (building == null &&
                         gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
 
-                    if (gold >= 10) {
+                    if (gold >= 100) {
                         gameMap.removeForest(positionX, positionY);
                         setGold(gold - 100);
                     }
@@ -156,6 +171,7 @@ public class MapView extends View {
                 return true;
             }
         });
+
         InputStream mapResource = context.getResources().openRawResource(R.raw.map_1);
         gameMap = new GameMap(mapResource);
 
@@ -341,20 +357,20 @@ public class MapView extends View {
             position.x *= tileSize;
             position.y *= tileSize;
 
-            float radius = (tileSize / 2 - 10);
+            float radius;
             if (building instanceof Castle) {
                 radius = ((Castle) building).getRadius() * tileSize;
                 canvas.drawCircle(position.x, position.y, radius, paintCastle);
 
-            } else if (building instanceof Tower) {
-                Tower tower = (Tower) building;
-                radius = tower.getRadius() * tileSize;
+            } else if (building instanceof RoundTower) {
+                RoundTower roundTower = (RoundTower) building;
+                radius = roundTower.getRadius() * tileSize;
                 canvas.drawCircle(position.x, position.y, radius, paintTower);
-                float scope = tower.getScope() * tileSize;
+                float scope = roundTower.getScope() * tileSize;
                 if (building == selectedBuilding) {
                     canvas.drawCircle(position.x, position.y, scope, paintTowerRange);
                 }
-                drawBullets(canvas, tower);
+                drawBullets(canvas, roundTower);
 
             } else if (building instanceof SquareTower) {
                 RectF rect = new RectF();
@@ -387,8 +403,8 @@ public class MapView extends View {
         }
     }
 
-    private void drawBullets(Canvas canvas, Tower tower) {
-        for (Bullet bullet : tower.getBullets()) {
+    private void drawBullets(Canvas canvas, RoundTower roundTower) {
+        for (Bullet bullet : roundTower.getBullets()) {
             if (bullet.isFree()) continue;
 
             PointF position = Vectors.copy(bullet.getPosition());

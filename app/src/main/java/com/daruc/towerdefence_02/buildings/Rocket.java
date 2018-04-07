@@ -15,11 +15,12 @@ import java.util.List;
 
 public class Rocket {
     private PointF position;
-    private PointF towerPosition;
-    private float speed = 4f;
-    private int damage = 5;
+    private final PointF towerPosition;
     private Direction direction;
     private Enemy lastVictim;
+
+    private int damage = 5;
+    private float speed = 4f;
 
     public Rocket(PointF towerPosition) {
         this.towerPosition = towerPosition;
@@ -31,20 +32,20 @@ public class Rocket {
             return;
         }
 
-        float deltaTime = deltaTimeMillis / 1000f;
+        float displacement = (deltaTimeMillis / 1000f) * speed;
 
         switch (direction) {
             case RIGHT:
-                position.x += deltaTime * speed;
+                position.x += displacement;
                 break;
             case LEFT:
-                position.x -= deltaTime * speed;
+                position.x -= displacement;
                 break;
             case DOWN:
-                position.y += deltaTime * speed;
+                position.y += displacement;
                 break;
             case UP:
-                position.y -= deltaTime * speed;
+                position.y -= displacement;
                 break;
         }
     }
