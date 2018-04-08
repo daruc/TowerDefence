@@ -25,7 +25,7 @@ public class GameView extends ViewGroup {
     private TextView goldView;
 
 
-    public GameView(final Context context) {
+    public GameView(final Context context, int mapId) {
         super(context);
         setWillNotDraw(false);
         restartButton = new Button(context);
@@ -33,7 +33,7 @@ public class GameView extends ViewGroup {
         upgradeButton = new Button(context);
         buildingsButton = new Button(context);
         goldView = new TextView(context);
-        mapView = new MapView(context);
+        mapView = new MapView(context, mapId);
         restartButton.setText("Restart");
         restartButton.setOnClickListener(new OnClickListener() {
             @Override

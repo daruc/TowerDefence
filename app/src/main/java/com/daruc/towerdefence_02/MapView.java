@@ -86,7 +86,7 @@ public class MapView extends View {
         }
     }
 
-    public MapView(Context context) {
+    public MapView(Context context, int mapId) {
         super(context);
 
         mediaPlayer = MediaPlayer.create(context, R.raw.sound);
@@ -172,7 +172,7 @@ public class MapView extends View {
             }
         });
 
-        InputStream mapResource = context.getResources().openRawResource(R.raw.map_1);
+        InputStream mapResource = context.getResources().openRawResource(mapId);
         gameMap = new GameMap(mapResource);
 
         updateMap = new UpdateMap(this);
