@@ -1,9 +1,11 @@
 package com.daruc.towerdefence.building.drawingstrategy;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.daruc.towerdefence.MapView;
@@ -44,12 +46,23 @@ public class SquareTowerDrawingStrategy extends BuildingDrawingStrategy {
         int tileSize = mapView.getTileSize();
         position.x *= tileSize;
         position.y *= tileSize;
-        RectF rect = new RectF();
-        rect.left = position.x - (tileSize / 2) + 10f;
-        rect.right = position.x + (tileSize / 2) - 10f;
-        rect.top = position.y - (tileSize / 2) + 10f;
-        rect.bottom = position.y + (tileSize / 2) - 10f;
-        canvas.drawRect(rect, paintSquareTower);
+
+        Bitmap squareTowerBitmap = mapView.getSquareTowerBitmap();
+        int bitmapHeight = squareTowerBitmap.getHeight();
+        int level = ((SquareTower) building).getLevel();
+        Rect source = new Rect(bitmapHeight * (level - 1),
+                0,
+                bitmapHeight * level,
+                bitmapHeight);
+
+        RectF destination = new RectF();
+        destination.left = position.x - (tileSize / 2);
+        destination.right = position.x + (tileSize / 2);
+        destination.top = position.y - (tileSize / 2);
+        destination.bottom = position.y + (tileSize / 2);
+        //canvas.drawRect(rect, paintSquareTower);
+        canvas.drawBitmap(squareTowerBitmap, source, destination, null);
+
 
         if (building == mapView.getSelectedBuilding()) {
             canvas.drawLine(0f, position.y, mapView.getWidth(), position.y, paintSquareTowerRange);

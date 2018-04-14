@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.daruc.towerdefence.building.RoundTower;
+import com.daruc.towerdefence.building.Upgradable;
 
 /**
  * Created by darek on 02.04.18.
@@ -54,11 +55,11 @@ public class GameView extends ViewGroup {
         upgradeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                RoundTower roundTower = (RoundTower) mapView.getSelectedBuilding();
-                if (roundTower != null) {
+                Upgradable upgradable = (Upgradable) mapView.getSelectedBuilding();
+                if (upgradable != null) {
                     int gold = mapView.getGold();
                     if (gold >= 50) {
-                        if (roundTower.upgrade()) {
+                        if (upgradable.upgrade()) {
                             mapView.setGold(gold - 50);
                         }
                     }

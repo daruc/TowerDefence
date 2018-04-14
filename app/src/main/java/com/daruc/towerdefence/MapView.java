@@ -67,6 +67,10 @@ public class MapView extends View {
     private Bitmap pathBitmap;
     private Bitmap stoneBitmap;
 
+    private Bitmap roundTowerBitmap;
+    private Bitmap squareTowerBitmap;
+    private Bitmap powerGeneratorBitmap;
+
     private int buildingSelectionIdx = 0;
     private enum BuildingSelection {
         ROUND_TOWER(0), SQUARE_TOWER(1), POWER_GENERATOR(2),
@@ -110,6 +114,10 @@ public class MapView extends View {
             public void onClick(View v) {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
+
+                if (positionX >= gameMap.getWidth() || positionY >= gameMap.getHeight()) {
+                    return;
+                }
 
                 switch (BuildingSelection.fromIndex(buildingSelectionIdx)) {
 
@@ -274,6 +282,10 @@ public class MapView extends View {
         stoneBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.stone);
         waterBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.water);
         forestBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.forest);
+
+        roundTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.round_tower);
+        squareTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.square_tower);
+        powerGeneratorBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.power_generator);
     }
 
     @Override
@@ -438,5 +450,17 @@ public class MapView extends View {
 
     public int getTileSize() {
         return tileSize;
+    }
+
+    public Bitmap getRoundTowerBitmap() {
+        return roundTowerBitmap;
+    }
+
+    public Bitmap getSquareTowerBitmap()  {
+        return squareTowerBitmap;
+    }
+
+    public Bitmap getPowerGeneratorBitmap() {
+        return powerGeneratorBitmap;
     }
 }

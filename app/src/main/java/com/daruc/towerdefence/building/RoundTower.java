@@ -15,7 +15,7 @@ import java.util.List;
 
 public class RoundTower extends Building implements PowerReceiver, Upgradable {
 
-    private static final int MAX_LEVEL = 1000;
+    private static final int MAX_LEVEL = 10;
     public static final int COST = 10;
 
     private List<Bullet> bullets = new ArrayList<>(1);

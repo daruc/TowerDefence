@@ -19,7 +19,7 @@ import static com.daruc.towerdefence.Direction.UP;
  */
 
 public class SquareTower extends Building implements PowerReceiver, Upgradable {
-    private static final int MAX_LEVEL = 1000;
+    private static final int MAX_LEVEL = 10;
     public static final int COST = 200;
 
     private int level = 1;

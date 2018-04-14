@@ -1,9 +1,12 @@
 package com.daruc.towerdefence.building.drawingstrategy;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import com.daruc.towerdefence.MapView;
 import com.daruc.towerdefence.Vectors;
@@ -17,16 +20,11 @@ import com.daruc.towerdefence.building.RoundTower;
 
 public class RoundTowerDrawingStrategy extends BuildingDrawingStrategy {
 
-    private Paint paintTower;
     private Paint paintTowerRange;
     private Paint paintBullet;
 
     public RoundTowerDrawingStrategy(Building building) {
         super(building);
-
-        paintTower = new Paint();
-        paintTower.setColor(Color.BLUE);
-        paintTower.setStyle(Paint.Style.FILL);
 
         paintTowerRange = new Paint();
         paintTowerRange.setStyle(Paint.Style.STROKE);
@@ -45,8 +43,23 @@ public class RoundTowerDrawingStrategy extends BuildingDrawingStrategy {
         int tileSize = mapView.getTileSize();
         position.x *= tileSize;
         position.y *= tileSize;
-        float radius = roundTower.getRadius() * tileSize;
-        canvas.drawCircle(position.x, position.y, radius, paintTower);
+
+        Bitmap roundTowerBitmap = mapView.getRoundTowerBitmap();
+        int bitmapHeight = roundTowerBitmap.getHeight();
+        int level = ((RoundTower) building).getLevel();
+
+        Rect source = new Rect(bitmapHeight * (level - 1),
+                0,
+                bitmapHeight * level,
+                bitmapHeight);
+
+        RectF destination = new RectF(position.x - (tileSize / 2),
+                position.y - (tileSize / 2),
+                position.x + (tileSize / 2),
+                position.y + (tileSize / 2));
+
+        canvas.drawBitmap(roundTowerBitmap, source, destination, null);
+
         float scope = roundTower.getScope() * tileSize;
         if (building == mapView.getSelectedBuilding()) {
             canvas.drawCircle(position.x, position.y, scope, paintTowerRange);
