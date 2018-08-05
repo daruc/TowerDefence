@@ -212,7 +212,8 @@ public class GameMap {
 
     public SquareTower buildSquareTower(int x, int y) {
         if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            SquareTower squareTower = new SquareTower(new PointF(x + 0.5f, y + 0.5f));
+            SquareTower squareTower =
+                    new SquareTower(new PointF(x + 0.5f, y + 0.5f), groundTiles);
             buildings[y][x] = squareTower;
             buildingsList.add(squareTower);
 

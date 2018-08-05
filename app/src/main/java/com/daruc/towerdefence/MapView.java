@@ -70,6 +70,7 @@ public class MapView extends View {
     private Bitmap roundTowerBitmap;
     private Bitmap squareTowerBitmap;
     private Bitmap powerGeneratorBitmap;
+    private Bitmap boatBitmap;
 
     private int buildingSelectionIdx = 0;
     private enum BuildingSelection {
@@ -286,6 +287,7 @@ public class MapView extends View {
         roundTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.round_tower);
         squareTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.square_tower);
         powerGeneratorBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.power_generator);
+        boatBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.boat);
     }
 
     @Override
@@ -462,5 +464,9 @@ public class MapView extends View {
 
     public Bitmap getPowerGeneratorBitmap() {
         return powerGeneratorBitmap;
+    }
+
+    public Bitmap getBoatBitmap() {
+        return boatBitmap;
     }
 }

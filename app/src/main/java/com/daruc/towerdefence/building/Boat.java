@@ -10,8 +10,9 @@ import com.daruc.towerdefence.building.drawingstrategy.BoatDrawingStrategy;
 
 public class Boat extends Building implements Upgradable {
 
-    private static final int MAX_LEVEL = 1000;
+    private static final int MAX_LEVEL = 10;
     public static final int COST = 250;
+    private float scope = 1.5f;
     private int level = 1;
 
     public Boat(PointF position) {
@@ -41,5 +42,9 @@ public class Boat extends Building implements Upgradable {
     @Override
     public int getCost() {
         return COST;
+    }
+
+    public float getScope() {
+        return scope;
     }
 }

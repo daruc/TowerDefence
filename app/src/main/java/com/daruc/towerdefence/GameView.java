@@ -3,11 +3,14 @@ package com.daruc.towerdefence;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daruc.towerdefence.building.RoundTower;
@@ -18,7 +21,10 @@ import com.daruc.towerdefence.building.Upgradable;
  */
 
 public class GameView extends ViewGroup {
+    private Bitmap backgroundImageBitmap;
+
     private MapView mapView;
+    private ImageView backgroundImage;
     private Button restartButton;
     private Button nextWaveButton;
     private Button upgradeButton;
@@ -29,12 +35,19 @@ public class GameView extends ViewGroup {
     public GameView(final Context context, int mapId) {
         super(context);
         setWillNotDraw(false);
+
+        backgroundImage = new ImageView(context);
         restartButton = new Button(context);
         nextWaveButton = new Button(context);
         upgradeButton = new Button(context);
         buildingsButton = new Button(context);
         goldView = new TextView(context);
         mapView = new MapView(context, mapId);
+
+        backgroundImageBitmap =
+                BitmapFactory.decodeResource(getResources(), R.drawable.game_background);
+        backgroundImage.setImageBitmap(backgroundImageBitmap);
+
         restartButton.setText("Restart");
         restartButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -111,6 +124,7 @@ public class GameView extends ViewGroup {
         int gold = mapView.getGold();
         goldView.setText("Gold: " + gold);
 
+        addView(backgroundImage);
         addView(restartButton);
         addView(nextWaveButton);
         addView(upgradeButton);
@@ -126,6 +140,10 @@ public class GameView extends ViewGroup {
             getChildAt(i).layout(l, t, r, b);
 
         }
+        int mapHeight = mapView.getTileSize() * mapView.getGameMap().getHeight();
+        float imageHwRatio = ((float) backgroundImageBitmap.getHeight()) / backgroundImageBitmap.getWidth();
+        int backgroundImageBottom = mapHeight + (int) (r * imageHwRatio);
+        backgroundImage.layout(0, mapHeight, r, backgroundImageBottom);
         restartButton.layout(0, b - 170, 200, b);
         nextWaveButton.layout(210, b - 170, 400, b);
         upgradeButton.layout(410, b - 170, 600, b);

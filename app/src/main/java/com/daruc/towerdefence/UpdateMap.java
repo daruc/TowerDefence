@@ -12,6 +12,8 @@ import com.daruc.towerdefence.building.Rocket;
 import com.daruc.towerdefence.building.RoundTower;
 import com.daruc.towerdefence.building.SquareTower;
 
+import java.util.List;
+
 /**
  * Created by darek on 05.04.18.
  */
@@ -101,21 +103,18 @@ public class UpdateMap implements Runnable {
     }
 
     private void updateSquareTower(long time, SquareTower squareTower) {
-        Direction direction = squareTower.findEnemies(gameMap.getEnemies());
-
         for (Rocket rocket : squareTower.getRockets()) {
-            if (direction != null) {
-                if (rocket.isFree()) {
-                    rocket.setDirection(direction);
-                }
-                rocket.move(refreshTime);
-                Enemy victim = rocket.collision(gameMap.getEnemies());
-                if (victim != null) {
-                    //Log.d("ENEMY", "rocket-enemy collision" + victim);
-                    victim.decreaseHealth(rocket.getDamage());
-                }
+            if (rocket.isFree()) {
+                Direction direction = squareTower.findEnemies(gameMap.getEnemies());
+                rocket.setDirection(direction);
             }
-            if (rocket.isOutOfMap(gameMap) || direction == null) {
+            rocket.move(refreshTime);
+            Enemy victim = rocket.collision(gameMap.getEnemies());
+            if (victim != null) {
+                victim.decreaseHealth(rocket.getDamage());
+            }
+
+            if (rocket.isOutOfMap(gameMap)) {
                 rocket.reset();
             }
         }

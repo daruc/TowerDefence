@@ -1,9 +1,11 @@
 package com.daruc.towerdefence.building;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 
 import com.daruc.towerdefence.Direction;
 import com.daruc.towerdefence.Enemy;
+import com.daruc.towerdefence.GroundType;
 import com.daruc.towerdefence.building.drawingstrategy.SquareTowerDrawingStrategy;
 
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import static com.daruc.towerdefence.Direction.DOWN;
 import static com.daruc.towerdefence.Direction.LEFT;
 import static com.daruc.towerdefence.Direction.RIGHT;
 import static com.daruc.towerdefence.Direction.UP;
+import static java.lang.Math.round;
 
 /**
  * Created by darek on 06.04.18.
@@ -25,6 +28,8 @@ public class SquareTower extends Building implements PowerReceiver, Upgradable {
     private int level = 1;
     private List<Rocket> rockets;
     private PowerGenerator powerGenerator;
+    private int enemyDirectionIndex = 0;
+    private List<Direction> directions;
 
     @Override
     public boolean upgrade() {
@@ -45,33 +50,66 @@ public class SquareTower extends Building implements PowerReceiver, Upgradable {
         return MAX_LEVEL;
     }
 
-    public SquareTower(PointF position) {
+    public SquareTower(PointF position, GroundType[][] groundTiles) {
         super(position);
-        rockets = new ArrayList<>(1);
-        Rocket rocket = new Rocket(position);
-        rockets.add(rocket);
+        directions = possibleDirections(position, groundTiles);
+        rockets = new ArrayList<>(directions.size());
+        for (int i = 0; i < directions.size(); ++i) {
+            Rocket rocket = new Rocket(position);
+            rockets.add(rocket);
+        }
 
         drawingStrategy = new SquareTowerDrawingStrategy(this);
     }
 
-    public Direction findEnemies(List<Enemy> enemies) {
-        for (Enemy enemy : enemies) {
-            PointF enemyPosition = enemy.getPosition();
-            if (enemyPosition.x == position.x) {
-                if (enemyPosition.y > position.y) {
-                    return DOWN;
-                } else {
-                    return UP;
-                }
-            } else if (enemyPosition.y == position.y) {
-                if (enemyPosition.x > position.x) {
-                    return RIGHT;
-                } else {
-                    return LEFT;
-                }
+    public List<Direction> possibleDirections(PointF position, GroundType[][] groundTiles) {
+        List<Direction> directions = new ArrayList<>(4);
+
+        int towerX = Math.round(position.x - 0.5f);
+        int towerY = Math.round(position.y - 0.5f);
+        int height = groundTiles.length;
+        int width = groundTiles[0].length;
+        for (int y = towerY + 1; y < height; ++y) {
+            if (groundTiles[y][towerX] == GroundType.PATH) {
+                directions.add(Direction.DOWN);
+                break;
             }
         }
-        return null;
+        for (int y = towerY - 1; y >= 0; --y) {
+            if (groundTiles[y][towerX] == GroundType.PATH) {
+                directions.add(Direction.UP);
+                break;
+            }
+        }
+        for (int x = towerX + 1; x < width; ++x) {
+            if (groundTiles[towerY][x] == GroundType.PATH) {
+                directions.add(Direction.RIGHT);
+                break;
+            }
+        }
+        for (int x = towerX - 1; x >= 0; --x) {
+            if (groundTiles[towerY][x] == GroundType.PATH) {
+                directions.add(Direction.LEFT);
+                break;
+            }
+        }
+        return directions;
+    }
+
+    public Direction findEnemies(List<Enemy> enemies) {
+        boolean areDead = true;
+        for (Enemy enemy : enemies) {
+            if (!enemy.isDead()) {
+                areDead = false;
+                break;
+            }
+        }
+        if (areDead) {
+            return null;
+        }
+
+        enemyDirectionIndex = (enemyDirectionIndex + 1) % directions.size();
+        return directions.get(enemyDirectionIndex);
     }
 
     @Override
