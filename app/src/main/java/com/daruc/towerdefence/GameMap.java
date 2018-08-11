@@ -481,4 +481,20 @@ public class GameMap {
             enemies.add(enemy);
         }
     }
+
+    public Boat moveBoat(int oldPositionX, int oldPositionY, int newPositionX, int newPositionY) {
+        Building building = buildings[oldPositionY][oldPositionX];
+        if (building instanceof Boat) {
+            Boat boat = (Boat) building;
+            List<Point> moveBoatPath = moveBoatPath(oldPositionX, oldPositionY, newPositionX, newPositionY);
+            return boat;
+        } else {
+            return null;
+        }
+    }
+
+    private List<Point> moveBoatPath(int oldPositionX, int oldPositionY, int newPositionX, int newPositionY) {
+        // TODO
+        return null;
+    }
 }
