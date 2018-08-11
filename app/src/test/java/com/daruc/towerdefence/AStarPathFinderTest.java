@@ -22,7 +22,7 @@ public class AStarPathFinderTest {
         };
 
         AStarPathFinder pathFinder = new AStarPathFinder(map);
-        List<MapPoint> path = pathFinder.find(0, 0, 3, 4);
+        List<MapPoint> path = pathFinder.find(new MapPoint(0, 0), new MapPoint(3, 4));
 
         assertEquals(14, path.size());
 

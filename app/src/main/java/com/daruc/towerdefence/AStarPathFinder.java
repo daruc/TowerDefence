@@ -1,10 +1,9 @@
 package com.daruc.towerdefence;
 
-import android.graphics.Point;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -15,7 +14,7 @@ import java.util.PriorityQueue;
 public class AStarPathFinder {
     private boolean[][] map;
     private int[][] cost;
-    private IntPoint[][] predecessor;
+    private PriorityPoint[][] predecessor;
 
     public AStarPathFinder(boolean[][] map) {
         if (map.length < 2 || map[0].length < 2) {
@@ -31,34 +30,34 @@ public class AStarPathFinder {
             }
         }
 
-        predecessor = new IntPoint[map.length][];
+        predecessor = new PriorityPoint[map.length][];
         for (int y = 0; y < map.length; ++y) {
-            predecessor[y] = new IntPoint[map[0].length];
+            predecessor[y] = new PriorityPoint[map[0].length];
         }
     }
 
-    public List<MapPoint> find(int sourceX, int sourceY, int destinationX, int destinationY) {
-        if (sourceY < 0 || sourceY >= map.length) {
+    public List<MapPoint> find(MapPoint pSource, MapPoint pDestination) {
+        if (pDestination.getY() < 0 || pDestination.getY() >= map.length) {
             throw new RuntimeException("Wrong sourceY");
         }
-        if (sourceX < 0 || sourceX >= map[0].length) {
+        if (pSource.getY() < 0 || pSource.getY() >= map[0].length) {
             throw new RuntimeException("Wrong sourceX");
         }
 
-        IntPoint source = new IntPoint(sourceX, sourceY);
-        IntPoint destination = new IntPoint(destinationX, destinationY);
+        PriorityPoint source = new PriorityPoint(pSource.getX(), pSource.getY());
+        PriorityPoint destination = new PriorityPoint(pDestination.getX(), pDestination.getY());
 
-        PriorityQueue<IntPoint> frontier = new PriorityQueue<>(10, new IntPointComparator());
+        PriorityQueue<PriorityPoint> frontier = new PriorityQueue<>(10, new IntPointComparator());
         frontier.add(source);
-        cost[sourceY][sourceX] = 0;
+        cost[pSource.getY()][pSource.getX()] = 0;
 
         while (!frontier.isEmpty()) {
-            IntPoint current = frontier.poll();
+            PriorityPoint current = frontier.poll();
             if (current.equals(destination)) {
                 break;
             }
 
-            for (IntPoint next : getNeighbours(current)) {
+            for (PriorityPoint next : getNeighbours(current)) {
                 int newCost = cost[current.getY()][current.getX()] + 1;
                 if (newCost < cost[next.getY()][next.getX()]) {
                     cost[next.getY()][next.getX()] = newCost;
@@ -70,8 +69,8 @@ public class AStarPathFinder {
             }
         }
 
-        List<MapPoint> result = new ArrayList<>();
-        IntPoint current = destination;
+        List<MapPoint> result = new LinkedList<>();
+        PriorityPoint current = destination;
         do {
             result.add(new MapPoint(current.getX(), current.getY()));
             current = predecessor[current.getY()][current.getX()];
@@ -82,37 +81,37 @@ public class AStarPathFinder {
         return result;
     }
 
-    private List<IntPoint> getNeighbours(IntPoint point) {
-        List<IntPoint> neighbours = new ArrayList<>(4);
+    private List<PriorityPoint> getNeighbours(PriorityPoint point) {
+        List<PriorityPoint> neighbours = new ArrayList<>(4);
         if (point.getX() - 1 >= 0 && map[point.getY()][point.getX() - 1]) {
-            neighbours.add(new IntPoint(point.getX() - 1, point.getY()));
+            neighbours.add(new PriorityPoint(point.getX() - 1, point.getY()));
         }
 
         if (point.getX() + 1 < map[0].length && map[point.getY()][point.getX() + 1]) {
-            neighbours.add(new IntPoint(point.getX() + 1, point.getY()));
+            neighbours.add(new PriorityPoint(point.getX() + 1, point.getY()));
         }
 
         if (point.getY() - 1 >= 0 && map[point.getY() - 1][point.getX()]) {
-            neighbours.add(new IntPoint(point.getX(), point.getY() - 1));
+            neighbours.add(new PriorityPoint(point.getX(), point.getY() - 1));
         }
 
         if (point.getY() + 1 < map.length && map[point.getY() + 1][point.getX()]) {
-            neighbours.add(new IntPoint(point.getX(), point.getY() + 1));
+            neighbours.add(new PriorityPoint(point.getX(), point.getY() + 1));
         }
         return neighbours;
     }
 
-    private int distance(IntPoint pointA, IntPoint pointB) {
+    private int distance(PriorityPoint pointA, PriorityPoint pointB) {
         return Math.abs(pointA.getX() - pointB.getX()) + Math.abs(pointA.getY() - pointB.getY());
     }
 
-    private static class IntPoint {
+    private static class PriorityPoint {
 
         private int x;
         private int y;
         private int priority;
 
-        public IntPoint(int x, int y) {
+        public PriorityPoint(int x, int y) {
             this.x = x;
             this.y = y;
         }
@@ -134,9 +133,9 @@ public class AStarPathFinder {
         }
     }
 
-    private static class IntPointComparator implements Comparator<IntPoint> {
+    private static class IntPointComparator implements Comparator<PriorityPoint> {
         @Override
-        public int compare(IntPoint pointA, IntPoint pointB) {
+        public int compare(PriorityPoint pointA, PriorityPoint pointB) {
             return pointA.getPriority() - pointB.getPriority();
         }
     }

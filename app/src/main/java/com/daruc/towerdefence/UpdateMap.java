@@ -6,13 +6,12 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.daruc.towerdefence.building.Boat;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.Bullet;
 import com.daruc.towerdefence.building.Rocket;
 import com.daruc.towerdefence.building.RoundTower;
 import com.daruc.towerdefence.building.SquareTower;
-
-import java.util.List;
 
 /**
  * Created by darek on 05.04.18.
@@ -65,6 +64,8 @@ public class UpdateMap implements Runnable {
                 updateTower(time, (RoundTower) building);
             } else if (building instanceof SquareTower) {
                 updateSquareTower(time, (SquareTower) building);
+            } else if (building instanceof Boat) {
+                updateBoat((Boat) building);
             }
         }
 
@@ -119,6 +120,10 @@ public class UpdateMap implements Runnable {
             }
         }
 
+    }
+
+    private void updateBoat(Boat boat) {
+        boat.move(refreshTime);
     }
 
     public void stop() {

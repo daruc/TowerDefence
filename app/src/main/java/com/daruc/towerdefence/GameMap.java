@@ -14,13 +14,14 @@ import com.daruc.towerdefence.building.LaserTower;
 import com.daruc.towerdefence.building.PowerGenerator;
 import com.daruc.towerdefence.building.PowerReceiver;
 import com.daruc.towerdefence.building.Radar;
-import com.daruc.towerdefence.building.SquareTower;
 import com.daruc.towerdefence.building.RoundTower;
+import com.daruc.towerdefence.building.SquareTower;
 import com.daruc.towerdefence.building.VolcanicTower;
 import com.daruc.towerdefence.building.Wall;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -486,15 +487,37 @@ public class GameMap {
         Building building = buildings[oldPositionY][oldPositionX];
         if (building instanceof Boat) {
             Boat boat = (Boat) building;
-            List<Point> moveBoatPath = moveBoatPath(oldPositionX, oldPositionY, newPositionX, newPositionY);
+            List<MapPoint> moveBoatPath = moveBoatPath(new MapPoint(oldPositionX, oldPositionY),
+                    new MapPoint(newPositionX, newPositionY));
+
+            List<PointF> pointFMoveBoatPath = new LinkedList<>();
+            for (MapPoint mapPoint : moveBoatPath) {
+                PointF pointF = new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f);
+                pointFMoveBoatPath.add(pointF);
+            }
+            boat.setPath(pointFMoveBoatPath);
+
             return boat;
         } else {
             return null;
         }
     }
 
-    private List<Point> moveBoatPath(int oldPositionX, int oldPositionY, int newPositionX, int newPositionY) {
-        // TODO
-        return null;
+    private List<MapPoint> moveBoatPath(MapPoint source, MapPoint destination) {
+        boolean map[][] = new boolean[getHeight()][];
+        for (int h = 0; h < getHeight(); ++h) {
+            map[h] = new boolean[getWidth()];
+            for (int w = 0; w < getWidth(); ++w) {
+                if (groundTiles[h][w] == GroundType.WATER && buildings[h][w] == null) {
+                    map[h][w] = true;
+                } else {
+                    map[h][w] = false;
+                }
+            }
+        }
+
+        AStarPathFinder aStarPathFinder = new AStarPathFinder(map);
+
+        return aStarPathFinder.find(source, destination);
     }
 }

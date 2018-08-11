@@ -120,108 +120,114 @@ public class MapView extends View {
                     return;
                 }
 
-                switch (BuildingSelection.fromIndex(buildingSelectionIdx)) {
+                if (selectedBuilding instanceof Boat) {
+                    Boat boat = (Boat) selectedBuilding;
+                    PointF boatPosition = boat.getPosition();
+                    gameMap.moveBoat((int) boatPosition.x, (int) boatPosition.y, positionX, positionY);
+                } else {
+                    switch (BuildingSelection.fromIndex(buildingSelectionIdx)) {
 
-                    case ROUND_TOWER:
-                        if (gold >= RoundTower.COST) {
-                            RoundTower roundTower = gameMap.buildRoundTower(positionX, positionY);
-                            if (roundTower != null) {
-                                setGold(gold - roundTower.getCost());
+                        case ROUND_TOWER:
+                            if (gold >= RoundTower.COST) {
+                                RoundTower roundTower = gameMap.buildRoundTower(positionX, positionY);
+                                if (roundTower != null) {
+                                    setGold(gold - roundTower.getCost());
+                                }
                             }
-                        }
-                        break;
+                            break;
 
-                    case SQUARE_TOWER:
-                        if (gold >= SquareTower.COST) {
-                            SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
-                            if (squareTower != null) {
-                                setGold(gold - squareTower.getCost());
+                        case SQUARE_TOWER:
+                            if (gold >= SquareTower.COST) {
+                                SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
+                                if (squareTower != null) {
+                                    setGold(gold - squareTower.getCost());
+                                }
                             }
-                        }
-                        break;
+                            break;
 
-                    case POWER_GENERATOR:
-                        if (gold >= PowerGenerator.COST) {
-                            PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
-                            if (generator != null) {
-                                setGold(gold - generator.getCost());
+                        case POWER_GENERATOR:
+                            if (gold >= PowerGenerator.COST) {
+                                PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
+                                if (generator != null) {
+                                    setGold(gold - generator.getCost());
+                                }
                             }
-                        }
-                        break;
+                            break;
 
-                    case BOAT:
-                        if (gold >= Boat.COST) {
-                            Boat boat = gameMap.buildBoat(positionX, positionY);
-                            if (boat != null) {
-                                setGold(gold - boat.getCost());
+                        case BOAT:
+                            if (gold >= Boat.COST) {
+                                Boat boat = gameMap.buildBoat(positionX, positionY);
+                                if (boat != null) {
+                                    setGold(gold - boat.getCost());
+                                }
                             }
-                        }
-                        break;
+                            break;
 
-                    case ANTI_TANK_TOWER:
-                        if (gold >= AntiTankTower.COST) {
-                            AntiTankTower antiTankTower = gameMap.buildAntiTankTower(positionX, positionY);
-                            if (antiTankTower != null) {
-                                setGold(gold - antiTankTower.getCost());
+                        case ANTI_TANK_TOWER:
+                            if (gold >= AntiTankTower.COST) {
+                                AntiTankTower antiTankTower = gameMap.buildAntiTankTower(positionX, positionY);
+                                if (antiTankTower != null) {
+                                    setGold(gold - antiTankTower.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case BARRACKS:
-                        if (gold >= AntiTankTower.COST) {
-                            Barracks barracks = gameMap.buildBarracks(positionX, positionY);
-                            if (barracks != null) {
-                                setGold(gold - barracks.getCost());
+                            break;
+                        case BARRACKS:
+                            if (gold >= AntiTankTower.COST) {
+                                Barracks barracks = gameMap.buildBarracks(positionX, positionY);
+                                if (barracks != null) {
+                                    setGold(gold - barracks.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case ICE_TOWER:
-                        if (gold >= IceTower.COST) {
-                            IceTower iceTower = gameMap.buildIceTower(positionX, positionY);
-                            if (iceTower != null) {
-                                setGold(gold - iceTower.getCost());
+                            break;
+                        case ICE_TOWER:
+                            if (gold >= IceTower.COST) {
+                                IceTower iceTower = gameMap.buildIceTower(positionX, positionY);
+                                if (iceTower != null) {
+                                    setGold(gold - iceTower.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case VOLCANIC_TOWER:
-                        if (gold >= VolcanicTower.COST) {
-                            VolcanicTower volcanicTower = gameMap.buildVolcanicTower(positionX, positionY);
-                            if (volcanicTower != null) {
-                                setGold(gold - volcanicTower.getCost());
+                            break;
+                        case VOLCANIC_TOWER:
+                            if (gold >= VolcanicTower.COST) {
+                                VolcanicTower volcanicTower = gameMap.buildVolcanicTower(positionX, positionY);
+                                if (volcanicTower != null) {
+                                    setGold(gold - volcanicTower.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case LASER_TOWER:
-                        if (gold >= LaserTower.COST) {
-                            LaserTower laserTower = gameMap.buildLaserTower(positionX, positionY);
-                            if (laserTower != null) {
-                                setGold(gold - laserTower.getCost());
+                            break;
+                        case LASER_TOWER:
+                            if (gold >= LaserTower.COST) {
+                                LaserTower laserTower = gameMap.buildLaserTower(positionX, positionY);
+                                if (laserTower != null) {
+                                    setGold(gold - laserTower.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case RADAR:
-                        if (gold >= Radar.COST) {
-                            Radar radar = gameMap.buildRadar(positionX, positionY);
-                            if (radar != null) {
-                                setGold(gold - radar.getCost());
+                            break;
+                        case RADAR:
+                            if (gold >= Radar.COST) {
+                                Radar radar = gameMap.buildRadar(positionX, positionY);
+                                if (radar != null) {
+                                    setGold(gold - radar.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case WALL:
-                        if (gold >= Wall.COST) {
-                            Wall wall = gameMap.buildWall(positionX, positionY);
-                            if (wall != null) {
-                                setGold(gold - wall.getCost());
+                            break;
+                        case WALL:
+                            if (gold >= Wall.COST) {
+                                Wall wall = gameMap.buildWall(positionX, positionY);
+                                if (wall != null) {
+                                    setGold(gold - wall.getCost());
+                                }
                             }
-                        }
-                        break;
-                    case AREA_DAMAGE_TOWER:
-                        if (gold >= AreaDamageTower.COST) {
-                            AreaDamageTower areaDamageTower = gameMap.buildAreaDamageTower(positionX, positionY);
-                            if (areaDamageTower != null) {
-                                setGold(gold - areaDamageTower.getCost());
+                            break;
+                        case AREA_DAMAGE_TOWER:
+                            if (gold >= AreaDamageTower.COST) {
+                                AreaDamageTower areaDamageTower = gameMap.buildAreaDamageTower(positionX, positionY);
+                                if (areaDamageTower != null) {
+                                    setGold(gold - areaDamageTower.getCost());
+                                }
                             }
-                        }
-                        break;
+                            break;
+                    }
                 }
 
                 Building newSelectedBuilding = gameMap.getBuilding(positionX, positionY);
