@@ -40,7 +40,7 @@ public class AStarPathFinder {
         if (pDestination.getY() < 0 || pDestination.getY() >= map.length) {
             throw new RuntimeException("Wrong sourceY");
         }
-        if (pSource.getY() < 0 || pSource.getY() >= map[0].length) {
+        if (pSource.getX() < 0 || pSource.getX() >= map[0].length) {
             throw new RuntimeException("Wrong sourceX");
         }
 
@@ -74,9 +74,11 @@ public class AStarPathFinder {
         do {
             result.add(new MapPoint(current.getX(), current.getY()));
             current = predecessor[current.getY()][current.getX()];
+            if (current == null) {
+                return null;
+            }
         } while (!current.equals(source));
 
-        result.add(new MapPoint(source.getX(), source.getY()));
         Collections.reverse(result);
         return result;
     }

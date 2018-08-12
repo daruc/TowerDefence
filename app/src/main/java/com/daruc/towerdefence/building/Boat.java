@@ -62,9 +62,10 @@ public class Boat extends Building implements Upgradable {
         if (movePath != null && !movePath.isEmpty()) {
             PointF direction = Vectors.unitVector(position, movePath.get(0));
             position.x += direction.x * (deltaTimeMillis / 1000.0f) * moveSpeed;
-            position.x += direction.y * (deltaTimeMillis / 1000.0f) * moveSpeed;
+            position.y += direction.y * (deltaTimeMillis / 1000.0f) * moveSpeed;
 
-            if (Vectors.distance(position, movePath.get(0)) < 0.1f) {
+            if (Vectors.distance(position, movePath.get(0)) < 0.05f) {
+                position = movePath.get(0);
                 movePath.remove(0);
             }
         }

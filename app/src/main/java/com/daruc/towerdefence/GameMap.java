@@ -485,19 +485,27 @@ public class GameMap {
 
     public Boat moveBoat(int oldPositionX, int oldPositionY, int newPositionX, int newPositionY) {
         Building building = buildings[oldPositionY][oldPositionX];
-        if (building instanceof Boat) {
+        if (building instanceof Boat && buildings[newPositionY][newPositionX] == null
+                && groundTiles[newPositionY][newPositionX] == GroundType.WATER) {
             Boat boat = (Boat) building;
+
             List<MapPoint> moveBoatPath = moveBoatPath(new MapPoint(oldPositionX, oldPositionY),
                     new MapPoint(newPositionX, newPositionY));
 
-            List<PointF> pointFMoveBoatPath = new LinkedList<>();
-            for (MapPoint mapPoint : moveBoatPath) {
-                PointF pointF = new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f);
-                pointFMoveBoatPath.add(pointF);
-            }
-            boat.setPath(pointFMoveBoatPath);
+            if (moveBoatPath != null) {
+                List<PointF> pointFMoveBoatPath = new LinkedList<>();
+                for (MapPoint mapPoint : moveBoatPath) {
+                    PointF pointF = new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f);
+                    pointFMoveBoatPath.add(pointF);
+                }
+                boat.setPath(pointFMoveBoatPath);
 
-            return boat;
+                buildings[newPositionY][newPositionX] = boat;
+                buildings[oldPositionY][oldPositionX] = null;
+                return boat;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

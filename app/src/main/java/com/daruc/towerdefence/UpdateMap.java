@@ -20,7 +20,7 @@ import com.daruc.towerdefence.building.SquareTower;
 public class UpdateMap implements Runnable {
     private MapView mapView;
     private GameMap gameMap;
-    private int refreshTime = 20;
+    private int refreshTime = 33;
     private int soundId;
     private Context context;
     private SoundPool soundPool;
