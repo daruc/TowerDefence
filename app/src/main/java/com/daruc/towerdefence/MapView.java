@@ -51,7 +51,7 @@ public class MapView extends View {
     private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
     private int soundId;
 
-    private int refreshTime = 20;
+    private int refreshTime = 33;
 
     private Handler handler = new Handler();
     private PointF touchCoordinates = new PointF();
