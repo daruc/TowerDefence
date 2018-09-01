@@ -12,8 +12,10 @@ import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,13 +24,11 @@ import com.daruc.towerdefence.building.AreaDamageTower;
 import com.daruc.towerdefence.building.Barracks;
 import com.daruc.towerdefence.building.Boat;
 import com.daruc.towerdefence.building.Building;
-import com.daruc.towerdefence.building.Bullet;
 import com.daruc.towerdefence.building.Castle;
 import com.daruc.towerdefence.building.IceTower;
 import com.daruc.towerdefence.building.LaserTower;
 import com.daruc.towerdefence.building.PowerGenerator;
 import com.daruc.towerdefence.building.Radar;
-import com.daruc.towerdefence.building.Rocket;
 import com.daruc.towerdefence.building.RoundTower;
 import com.daruc.towerdefence.building.SquareTower;
 import com.daruc.towerdefence.building.VolcanicTower;
@@ -40,7 +40,14 @@ import java.io.InputStream;
  * Created by darek on 02.04.18.
  */
 
-public class MapView extends View {
+public class MapView extends SurfaceView implements Runnable {
+
+    private Thread thread;
+    private volatile boolean playing;
+    private Canvas canvas;
+    private SurfaceHolder surfaceHolder;
+    private long lastTime;
+
     private Building selectedBuilding;
     private GameMap gameMap;
     private Paint paint = new Paint();
@@ -51,9 +58,8 @@ public class MapView extends View {
     private SoundPool soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
     private int soundId;
 
-    private int refreshTime = 33;
+    private int refreshTime = 20;
 
-    private Handler handler = new Handler();
     private PointF touchCoordinates = new PointF();
 
     private UpdateMap updateMap;
@@ -73,6 +79,7 @@ public class MapView extends View {
     private Bitmap boatBitmap;
 
     private int buildingSelectionIdx = 0;
+
     private enum BuildingSelection {
         ROUND_TOWER(0), SQUARE_TOWER(1), POWER_GENERATOR(2),
         BOAT(3), ANTI_TANK_TOWER(4), BARRACKS(5),
@@ -96,6 +103,8 @@ public class MapView extends View {
 
     public MapView(Context context, int mapId) {
         super(context);
+
+        surfaceHolder = getHolder();
 
         mediaPlayer = MediaPlayer.create(context, R.raw.sound);
         soundId = soundPool.load(context, R.raw.sound, 1);
@@ -268,9 +277,10 @@ public class MapView extends View {
         gameMap = new GameMap(mapResource);
 
         updateMap = new UpdateMap(this);
-        updateMap.run();
 
         initPaints();
+
+        resume();
     }
 
     private void initPaints() {
@@ -282,8 +292,6 @@ public class MapView extends View {
         paintEnemy.setColor(Color.BLACK);
         paintEnemy.setStyle(Paint.Style.FILL);
 
-
-
         grassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
         pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.path);
         stoneBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.stone);
@@ -294,14 +302,6 @@ public class MapView extends View {
         squareTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.square_tower);
         powerGeneratorBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.power_generator);
         boatBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.boat);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        drawGround(canvas);
-        drawEnemies(canvas);
-        drawBuildings(canvas);
-        postInvalidateDelayed(refreshTime);
     }
 
     @Override
@@ -402,7 +402,6 @@ public class MapView extends View {
 
         updateMap.stop();
         updateMap = new UpdateMap(this);
-        updateMap.run();
     }
 
     public GameMap getGameMap() {
@@ -415,10 +414,6 @@ public class MapView extends View {
 
     public int getSoundId() {
         return soundId;
-    }
-
-    public Handler getHandler() {
-        return handler;
     }
 
     public int getGold() {
@@ -436,8 +431,14 @@ public class MapView extends View {
 
     private void refreshGoldView() {
         GameView gameView = (GameView) getParent();
-        TextView goldView = gameView.getGoldView();
-        goldView.setText("Gold: " + String.valueOf(gold));
+        final TextView goldView = gameView.getGoldView();
+
+        goldView.post(new Runnable() {
+            @Override
+            public void run() {
+                goldView.setText("Gold: " + String.valueOf(gold));
+            }
+        });
     }
 
     public void nextWave() {
@@ -474,5 +475,49 @@ public class MapView extends View {
 
     public Bitmap getBoatBitmap() {
         return boatBitmap;
+    }
+
+    @Override
+    public void run() {
+        lastTime = System.currentTimeMillis();
+        while (playing) {
+            long deltaTime = System.currentTimeMillis() - lastTime;
+            lastTime = System.currentTimeMillis();
+            if (deltaTime < refreshTime) {
+                try {
+                    Thread.sleep(refreshTime - deltaTime);
+                    deltaTime = refreshTime;
+                } catch (InterruptedException e) {
+                    Log.e("GAME", "Main loop sleep error.", e);
+                }
+            }
+            updateMap.update(deltaTime);
+            draw();
+        }
+    }
+
+    private void draw() {
+        if (surfaceHolder.getSurface().isValid()) {
+            canvas = surfaceHolder.lockCanvas();
+            drawGround(canvas);
+            drawEnemies(canvas);
+            drawBuildings(canvas);
+            surfaceHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    public void pause() {
+        playing = false;
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Log.e("Game", "MapView thread error" ,e);
+        }
+    }
+
+    public void resume() {
+        playing = true;
+        thread = new Thread(this);
+        thread.start();
     }
 }

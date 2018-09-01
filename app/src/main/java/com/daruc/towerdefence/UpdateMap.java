@@ -2,9 +2,7 @@ package com.daruc.towerdefence;
 
 import android.content.Context;
 import android.media.SoundPool;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.daruc.towerdefence.building.Boat;
 import com.daruc.towerdefence.building.Building;
@@ -17,14 +15,15 @@ import com.daruc.towerdefence.building.SquareTower;
  * Created by darek on 05.04.18.
  */
 
-public class UpdateMap implements Runnable {
+public class UpdateMap {
+    private static final long REFRESH_TIME = 20;
+
     private MapView mapView;
     private GameMap gameMap;
-    private int refreshTime = 33;
+    private long refreshTime = 20;
     private int soundId;
     private Context context;
     private SoundPool soundPool;
-    private Handler handler;
     private boolean stop = false;
 
     public UpdateMap(MapView mapView) {
@@ -33,11 +32,21 @@ public class UpdateMap implements Runnable {
         soundId = mapView.getSoundId();
         context = mapView.getContext();
         soundPool = mapView.getSoundPool();
-        handler = mapView.getHandler();
     }
 
-    @Override
-    public void run() {
+    public void update(long pRefreshTime) {
+        long steps = pRefreshTime / REFRESH_TIME;
+        long lastStepRefreshTime = pRefreshTime % REFRESH_TIME;
+
+        long singleStepRefreshTime = pRefreshTime / steps;
+        for (int i = 0; i < steps; ++i) {
+            updateSingleStep(singleStepRefreshTime);
+        }
+        updateSingleStep(lastStepRefreshTime);
+    }
+
+    private void updateSingleStep(long refreshTime) {
+        this.refreshTime = refreshTime;
         for (Enemy enemy: gameMap.getEnemies()) {
             if (enemy.isActive()) {
                 enemy.move(refreshTime);
@@ -46,14 +55,14 @@ public class UpdateMap implements Runnable {
                     gameMap.getCastle().decreaseHealth(1);
                     if (gameMap.getCastle().getHealth() == 0) {
                         Log.d("GAME", "Castle destroyed");
-                        Toast.makeText(context, "Defeat", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(context, "Defeat", Toast.LENGTH_LONG).show();
                     }
                 }
             }
         }
 
         if (!gameMap.getEnemies().isEmpty() && gameMap.enemiesDead()) {
-            Toast.makeText(context, "Victory", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "Victory", Toast.LENGTH_LONG).show();
             gameMap.getEnemies().clear();
             //gameMap.nextWave();
         }
@@ -67,10 +76,6 @@ public class UpdateMap implements Runnable {
             } else if (building instanceof Boat) {
                 updateBoat((Boat) building);
             }
-        }
-
-        if (!stop) {
-            handler.postDelayed(this, refreshTime);
         }
     }
 

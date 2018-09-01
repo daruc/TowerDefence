@@ -149,6 +149,7 @@ public class GameView extends ViewGroup {
         upgradeButton.layout(410, b - 170, 600, b);
         buildingsButton.layout(610, b - 170, 790, b);
         goldView.layout(r - 240, b - 170, r, b);
+        mapView.layout(0, 0, r, mapHeight);
     }
 
     @Override
@@ -165,4 +166,9 @@ public class GameView extends ViewGroup {
     public TextView getGoldView() {
         return goldView;
     }
+
+    public void pauseGame() {
+        mapView.pause();
+    }
+
 }

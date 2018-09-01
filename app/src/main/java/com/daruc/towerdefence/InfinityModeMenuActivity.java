@@ -29,7 +29,6 @@ public class InfinityModeMenuActivity extends Activity {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra(MAP_RESOURCE_ID, (Integer) mapAdapter.getItem(position));
                 startActivity(intent);
-                startActivity(intent);
             }
         });
     }
