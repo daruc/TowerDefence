@@ -58,7 +58,7 @@ public class GameMap {
         String mapStr = scanner.hasNext() ? scanner.next() : "";
         mapStr = mapStr.trim();
 
-        int width = mapStr.indexOf("\n");
+        int width = mapStr.indexOf("\r");
         Matcher matcher = Pattern.compile("\r\n|\r|\n").matcher(mapStr);
         int lines = 1;
         while (matcher.find()) {
@@ -67,12 +67,8 @@ public class GameMap {
         int height = lines;
 
         StringBuffer stringBuffer = new StringBuffer();
-        for (char ch : mapStr.toCharArray()) {
-            if (ch != '\n') {
-                stringBuffer.append(ch);
-            }
-        }
-        mapStr = stringBuffer.toString();
+
+        mapStr = mapStr.replaceAll("\r\n|\r|\n", "");
 
         groundTiles = new GroundType[height][];
         for (int h = 0; h < height; ++h) {
