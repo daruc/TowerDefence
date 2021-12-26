@@ -13,12 +13,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.daruc.towerdefence.building.RoundTower;
 import com.daruc.towerdefence.building.Upgradable;
 
-/**
- * Created by darek on 02.04.18.
- */
 
 public class GameView extends ViewGroup {
     private Bitmap backgroundImageBitmap;

@@ -4,16 +4,12 @@ import android.content.Context;
 import android.media.SoundPool;
 import android.util.Log;
 
-import com.daruc.towerdefence.building.Boat;
+import com.daruc.towerdefence.building.boat.Boat;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.Bullet;
 import com.daruc.towerdefence.building.Rocket;
-import com.daruc.towerdefence.building.RoundTower;
-import com.daruc.towerdefence.building.SquareTower;
-
-/**
- * Created by darek on 05.04.18.
- */
+import com.daruc.towerdefence.building.roundtower.RoundTower;
+import com.daruc.towerdefence.building.squaretower.SquareTower;
 
 public class UpdateMap {
     private static final long REFRESH_TIME = 20;

@@ -5,9 +5,6 @@ import android.os.Build;
 
 import com.daruc.towerdefence.building.drawingstrategy.BuildingDrawingStrategy;
 
-/**
- * Created by darek on 04.04.18.
- */
 
 public abstract class Building {
     protected PointF position;

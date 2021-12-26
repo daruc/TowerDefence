@@ -5,9 +5,6 @@ import android.graphics.Canvas;
 import com.daruc.towerdefence.MapView;
 import com.daruc.towerdefence.building.Building;
 
-/**
- * Created by darek on 08.04.18.
- */
 
 public abstract class BuildingDrawingStrategy {
     protected Building building;

@@ -8,6 +8,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+
 public class InfinityModeMenuActivity extends Activity {
     public static final String MAP_RESOURCE_ID = "mapResourceId";
     private MapAdapter mapAdapter;

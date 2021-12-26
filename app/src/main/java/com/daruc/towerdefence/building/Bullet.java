@@ -4,11 +4,8 @@ import android.graphics.PointF;
 
 import com.daruc.towerdefence.Enemy;
 import com.daruc.towerdefence.GameMap;
-import com.daruc.towerdefence.Vectors;
+import com.daruc.towerdefence.Vector;
 
-/**
- * Created by darek on 04.04.18.
- */
 
 public class Bullet {
     private PointF position;
@@ -32,15 +29,19 @@ public class Bullet {
     public void move(long deltaTimeMillis) {
 
         if (hasTarget()) {
-            direction = Vectors.unitVector(position, target.getPosition());
-
+            direction = calculateDirection();
             float displacement = ((float) deltaTimeMillis / 1000) * speed;
-
             position.x += direction.x * displacement;
             position.y += direction.y * displacement;
         } else if (!free) {
             moveStraight(deltaTimeMillis);
         }
+    }
+
+    private PointF calculateDirection() {
+        Vector targetVector = new Vector(target.getPosition());
+        Vector positionVector = new Vector(position);
+        return targetVector.minus(positionVector).getUnitVector().convertToPointF();
     }
 
     public void moveStraight(long deltaTimeMillis) {
@@ -78,8 +79,14 @@ public class Bullet {
         if (target == null) {
             return false;
         }
-        float distance = Vectors.distance(target.getPosition(), position);
+        float distance = calculateDistance();
         return distance <= target.getRadius();
+    }
+
+    private float calculateDistance() {
+        Vector targetVector = new Vector(target.getPosition());
+        Vector positionVector = new Vector(position);
+        return targetVector.minus(positionVector).length();
     }
 
     public Enemy getTarget() {

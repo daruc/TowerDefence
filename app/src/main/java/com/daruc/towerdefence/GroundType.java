@@ -1,8 +1,5 @@
 package com.daruc.towerdefence;
 
-/**
- * Created by darek on 02.04.18.
- */
 
 public enum GroundType {
     WATER('W'), GRASS('G'), PATH('R'), STONE('S'), FOREST('F'), CASTLE('C');

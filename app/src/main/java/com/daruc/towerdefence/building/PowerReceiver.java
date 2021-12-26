@@ -1,8 +1,7 @@
 package com.daruc.towerdefence.building;
 
-/**
- * Created by darek on 06.04.18.
- */
+
+import com.daruc.towerdefence.building.powergenerator.PowerGenerator;
 
 public interface PowerReceiver {
     boolean withPowerGenerator();

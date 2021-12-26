@@ -5,13 +5,10 @@ import android.graphics.PointF;
 import com.daruc.towerdefence.Direction;
 import com.daruc.towerdefence.Enemy;
 import com.daruc.towerdefence.GameMap;
-import com.daruc.towerdefence.Vectors;
+import com.daruc.towerdefence.Vector;
 
 import java.util.List;
 
-/**
- * Created by darek on 06.04.18.
- */
 
 public class Rocket {
     private PointF position;
@@ -24,7 +21,7 @@ public class Rocket {
 
     public Rocket(PointF towerPosition) {
         this.towerPosition = towerPosition;
-        position = Vectors.copy(towerPosition);
+        position = new PointF(towerPosition.x, towerPosition.y);
     }
 
     public void move(long deltaTimeMillis) {
@@ -88,7 +85,7 @@ public class Rocket {
             if (enemy == lastVictim) continue;
 
             PointF enemyPosition = enemy.getPosition();
-            float distance = Vectors.distance(position, enemyPosition);
+            float distance = calculateDistance(enemyPosition);
             if (distance <= enemy.getRadius()) {
                 lastVictim = enemy;
                 return enemy;
@@ -96,6 +93,12 @@ public class Rocket {
         }
 
         return null;
+    }
+
+    public float calculateDistance(PointF enemyPosition) {
+        Vector positionVector = new Vector(position);
+        Vector enemyVector = new Vector(enemyPosition);
+        return positionVector.minus(enemyVector).length();
     }
 
     public int getDamage() {

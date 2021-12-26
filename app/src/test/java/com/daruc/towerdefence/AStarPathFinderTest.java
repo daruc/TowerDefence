@@ -1,18 +1,12 @@
 package com.daruc.towerdefence;
 
-import android.graphics.Point;
 import static junit.framework.Assert.assertEquals;
 import org.junit.Test;
 import java.util.List;
 
-/**
- * Created by darek on 11.08.18.
- */
-
 public class AStarPathFinderTest {
 
-    @Test
-    public void pathFinderTest1() {
+    private boolean[][] createMap() {
         boolean map[][] = {
                 {true, true, true, true},
                 {false, false, false, true},
@@ -20,6 +14,12 @@ public class AStarPathFinderTest {
                 {true, false, false, false},
                 {true, true, true, true}
         };
+        return map;
+    }
+
+    @Test
+    public void testFindPath() {
+        boolean map[][] = createMap();
 
         AStarPathFinder pathFinder = new AStarPathFinder(map);
         List<MapPoint> path = pathFinder.find(new MapPoint(0, 0), new MapPoint(3, 4));
@@ -39,5 +39,54 @@ public class AStarPathFinderTest {
         assertEquals(new MapPoint(1, 4), path.get(10));
         assertEquals(new MapPoint(2, 4), path.get(11));
         assertEquals(new MapPoint(3, 4), path.get(12));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSourceXOutOfRange() {
+        boolean map[][] = createMap();
+        MapPoint sourceWrongX = new MapPoint(100, 1);
+        MapPoint destination = new MapPoint(1, 1);
+
+        AStarPathFinder pathFinder = new AStarPathFinder(map);
+        pathFinder.find(sourceWrongX, destination);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSourceYOutOfRange() {
+        boolean map[][] = createMap();
+        MapPoint sourceWrongX = new MapPoint(1, 100);
+        MapPoint destination = new MapPoint(1, 1);
+
+        AStarPathFinder pathFinder = new AStarPathFinder(map);
+        pathFinder.find(sourceWrongX, destination);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testDestinationXOutOfRange() {
+        boolean map[][] = createMap();
+        MapPoint source = new MapPoint(1, 1);
+        MapPoint destinationWrongX = new MapPoint(100, 1);
+
+        AStarPathFinder pathFinder = new AStarPathFinder(map);
+        pathFinder.find(source, destinationWrongX);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testDestinationYOutOfRange() {
+        boolean map[][] = createMap();
+        MapPoint source = new MapPoint(1, 1);
+        MapPoint destinationWrongY = new MapPoint(1, 100);
+
+        AStarPathFinder pathFinder = new AStarPathFinder(map);
+        pathFinder.find(source, destinationWrongY);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testMapWrongSize() {
+        boolean map[][] = {{true}};
+        MapPoint source = new MapPoint(0, 0);
+        MapPoint destination = new MapPoint(0, 0);
+
+        AStarPathFinder pathFinder = new AStarPathFinder(map);
     }
 }

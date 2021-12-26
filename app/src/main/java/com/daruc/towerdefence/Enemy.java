@@ -3,15 +3,12 @@ package com.daruc.towerdefence;
 import android.graphics.Point;
 import android.graphics.PointF;
 
-import com.daruc.towerdefence.building.Castle;
+import com.daruc.towerdefence.building.castle.Castle;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by darek on 04.04.18.
- */
 
 public class Enemy {
     private PointF position;
@@ -122,8 +119,14 @@ public class Enemy {
     public boolean castleCollision(Castle castle) {
         float castleRadius = castle.getRadius();
         PointF castlePosition = castle.getPosition();
-        float distance = Vectors.distance(position, castlePosition);
+        float distance = calculateDistance(castlePosition);
         return (distance < castleRadius);
+    }
+
+    public float calculateDistance(PointF otherPosition) {
+        Vector otherPositionVector = new Vector(otherPosition);
+        Vector positionVector = new Vector(position);
+        return otherPositionVector.minus(positionVector).length();
     }
 
     public boolean isDead() {

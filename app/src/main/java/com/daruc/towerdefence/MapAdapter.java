@@ -9,9 +9,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by darek on 07.04.18.
- */
 
 public class MapAdapter extends BaseAdapter {
 

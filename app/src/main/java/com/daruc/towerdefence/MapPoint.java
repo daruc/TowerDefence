@@ -1,8 +1,5 @@
 package com.daruc.towerdefence;
 
-/**
- * Created by darek on 11.08.18.
- */
 
 public class MapPoint {
     private int x;

@@ -13,14 +13,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        Intent intent = getIntent();
-        int mapId = intent.getIntExtra(InfinityModeMenuActivity.MAP_RESOURCE_ID, 0);
-        gameView = new GameView(this, mapId);
+        initGameView();
         setContentView(gameView);
         Log.d("GAME", "Game activity onCreate()");
+    }
+
+    private void initGameView() {
+        gameView = new GameView(this, getMapId());
+    }
+
+    private int getMapId() {
+        Intent intent = getIntent();
+        return intent.getIntExtra(InfinityModeMenuActivity.MAP_RESOURCE_ID, 0);
     }
 
     @Override
@@ -33,9 +38,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-
         Log.d("GAME", "Game activity. onStop()");
-
         gameView.releaseSound();
     }
 }

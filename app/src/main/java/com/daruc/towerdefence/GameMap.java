@@ -3,21 +3,21 @@ package com.daruc.towerdefence;
 import android.graphics.Point;
 import android.graphics.PointF;
 
-import com.daruc.towerdefence.building.AntiTankTower;
-import com.daruc.towerdefence.building.AreaDamageTower;
-import com.daruc.towerdefence.building.Barracks;
-import com.daruc.towerdefence.building.Boat;
+import com.daruc.towerdefence.building.antitanktower.AntiTankTower;
+import com.daruc.towerdefence.building.areadamagetower.AreaDamageTower;
+import com.daruc.towerdefence.building.barracks.Barracks;
+import com.daruc.towerdefence.building.boat.Boat;
 import com.daruc.towerdefence.building.Building;
-import com.daruc.towerdefence.building.Castle;
-import com.daruc.towerdefence.building.IceTower;
-import com.daruc.towerdefence.building.LaserTower;
-import com.daruc.towerdefence.building.PowerGenerator;
+import com.daruc.towerdefence.building.castle.Castle;
+import com.daruc.towerdefence.building.icetower.IceTower;
+import com.daruc.towerdefence.building.lasertower.LaserTower;
+import com.daruc.towerdefence.building.powergenerator.PowerGenerator;
 import com.daruc.towerdefence.building.PowerReceiver;
-import com.daruc.towerdefence.building.Radar;
-import com.daruc.towerdefence.building.RoundTower;
-import com.daruc.towerdefence.building.SquareTower;
-import com.daruc.towerdefence.building.VolcanicTower;
-import com.daruc.towerdefence.building.Wall;
+import com.daruc.towerdefence.building.radar.Radar;
+import com.daruc.towerdefence.building.roundtower.RoundTower;
+import com.daruc.towerdefence.building.squaretower.SquareTower;
+import com.daruc.towerdefence.building.volcanictower.VolcanicTower;
+import com.daruc.towerdefence.building.wall.Wall;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-/**
- * Created by darek on 02.04.18.
- */
 
 public class GameMap {
     private GroundType[][] groundTiles;
@@ -176,8 +172,6 @@ public class GameMap {
         }
     }
 
-
-
     public GroundType getGround(int x, int y) {
         if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) return GroundType.STONE;
         return groundTiles[y][x];
@@ -199,37 +193,8 @@ public class GameMap {
         return mapDimensions;
     }
 
-
-
-
-
     public List<Enemy> getEnemies() {
         return enemies;
-    }
-
-    public SquareTower buildSquareTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            SquareTower squareTower =
-                    new SquareTower(new PointF(x + 0.5f, y + 0.5f), groundTiles);
-            buildings[y][x] = squareTower;
-            buildingsList.add(squareTower);
-
-            PowerGenerator powerGenerator = findPowerGenerator(x, y);
-            squareTower.setPowerGenerator(powerGenerator);
-            return squareTower;
-        }
-        return null;
-    }
-
-    public PowerGenerator buildPowerGenerator(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            PowerGenerator generator = new PowerGenerator(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = generator;
-            buildingsList.add(generator);
-            connectPowerGenerator(x, y);
-            return generator;
-        }
-        return null;
     }
 
     private void connectPowerGenerator(int generatorX, int generatorY) {
@@ -280,112 +245,7 @@ public class GameMap {
                 y < 0 || y >= getHeight());
     }
 
-    public RoundTower buildRoundTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            RoundTower roundTower = new RoundTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = roundTower;
-            buildingsList.add(roundTower);
-
-            PowerGenerator powerGenerator = findPowerGenerator(x, y);
-            roundTower.setPowerGenerator(powerGenerator);
-            return roundTower;
-        }
-        return null;
-    }
-
-    public AntiTankTower buildAntiTankTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            AntiTankTower antiTankTower = new AntiTankTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = antiTankTower;
-            buildingsList.add(antiTankTower);
-            return antiTankTower;
-        }
-        return null;
-    }
-
-    public AreaDamageTower buildAreaDamageTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            AreaDamageTower areaDamageTower = new AreaDamageTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = areaDamageTower;
-            buildingsList.add(areaDamageTower);
-            return areaDamageTower;
-        }
-        return null;
-    }
-
-    public Barracks buildBarracks(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null
-                && isNextToPath(x, y)) {
-
-            Barracks barracks = new Barracks(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = barracks;
-            buildingsList.add(barracks);
-            return barracks;
-        }
-        return null;
-    }
-
-    public Boat buildBoat(int x, int y) {
-        if (groundTiles[y][x] == GroundType.WATER && buildings[y][x] == null) {
-            Boat boat = new Boat(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = boat;
-            buildingsList.add(boat);
-            return boat;
-        }
-        return null;
-    }
-
-    public IceTower buildIceTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            IceTower iceTower = new IceTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = iceTower;
-            buildingsList.add(iceTower);
-            return iceTower;
-        }
-        return null;
-    }
-
-    public LaserTower buildLaserTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            LaserTower laserTower = new LaserTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = laserTower;
-            buildingsList.add(laserTower);
-            return laserTower;
-        }
-        return null;
-    }
-
-    public Radar buildRadar(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null) {
-            Radar radar = new Radar(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = radar;
-            buildingsList.add(radar);
-            return radar;
-        }
-        return null;
-    }
-
-    public VolcanicTower buildVolcanicTower(int x, int y) {
-        if (groundTiles[y][x] == GroundType.GRASS && buildings[y][x] == null && isNextToPath(x, y)) {
-            VolcanicTower volcanicTower = new VolcanicTower(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = volcanicTower;
-            buildingsList.add(volcanicTower);
-            return volcanicTower;
-        }
-        return null;
-    }
-
-    public Wall buildWall(int x, int y) {
-        if (groundTiles[y][x] == GroundType.PATH && buildings[y][x] == null) {
-            Wall wall = new Wall(new PointF(x + 0.5f, y + 0.5f));
-            buildings[y][x] = wall;
-            buildingsList.add(wall);
-            return wall;
-        }
-        return null;
-    }
-
-    private boolean isNextToPath(int x, int y) {
+    public boolean isNextToPath(int x, int y) {
         return (!isOutOfTiles(x, y - 1) && groundTiles[y - 1][x] == GroundType.PATH) ||
                 (!isOutOfTiles(x, y + 1) && groundTiles[y + 1][x] == GroundType.PATH) ||
                 (!isOutOfTiles(x - 1, y) && groundTiles[y][x - 1] == GroundType.PATH) ||
@@ -397,6 +257,11 @@ public class GameMap {
             return null;
         }
         return buildings[y][x];
+    }
+
+    public void setBuilding(int mapX, int mapY, Building building) {
+        buildings[mapY][mapX] = building;
+        buildingsList.add(building);
     }
 
     public List<Building> getBuildings() {
@@ -523,5 +388,9 @@ public class GameMap {
         AStarPathFinder aStarPathFinder = new AStarPathFinder(map);
 
         return aStarPathFinder.find(source, destination);
+    }
+
+    public GroundType[][] getGroundTiles() {
+        return groundTiles;
     }
 }

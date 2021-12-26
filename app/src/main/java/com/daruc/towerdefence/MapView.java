@@ -19,26 +19,25 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.daruc.towerdefence.building.AntiTankTower;
-import com.daruc.towerdefence.building.AreaDamageTower;
-import com.daruc.towerdefence.building.Barracks;
-import com.daruc.towerdefence.building.Boat;
+import com.daruc.towerdefence.building.antitanktower.AntiTankTowerBuildingStrategy;
+import com.daruc.towerdefence.building.areadamagetower.AreaDamageTowerBuildingStrategy;
+import com.daruc.towerdefence.building.barracks.BarracksBuildingStrategy;
+import com.daruc.towerdefence.building.boat.Boat;
+import com.daruc.towerdefence.building.boat.BoatBuildingStrategy;
 import com.daruc.towerdefence.building.Building;
-import com.daruc.towerdefence.building.Castle;
-import com.daruc.towerdefence.building.IceTower;
-import com.daruc.towerdefence.building.LaserTower;
-import com.daruc.towerdefence.building.PowerGenerator;
-import com.daruc.towerdefence.building.Radar;
-import com.daruc.towerdefence.building.RoundTower;
-import com.daruc.towerdefence.building.SquareTower;
-import com.daruc.towerdefence.building.VolcanicTower;
-import com.daruc.towerdefence.building.Wall;
+import com.daruc.towerdefence.building.BuildingStrategy;
+import com.daruc.towerdefence.building.castle.Castle;
+import com.daruc.towerdefence.building.icetower.IceTowerBuildingStrategy;
+import com.daruc.towerdefence.building.lasertower.LaserTowerBuildingStrategy;
+import com.daruc.towerdefence.building.powergenerator.PowerGeneratorBuildingStrategy;
+import com.daruc.towerdefence.building.radar.RadarBuildingStrategy;
+import com.daruc.towerdefence.building.volcanictower.VolcanicTowerBuildingStrategy;
+import com.daruc.towerdefence.building.roundtower.RoundTowerBuildingStrategy;
+import com.daruc.towerdefence.building.squaretower.SquareTowerBuildingStrategy;
+import com.daruc.towerdefence.building.wall.WallBuildingStrategy;
 
 import java.io.InputStream;
 
-/**
- * Created by darek on 02.04.18.
- */
 
 public class MapView extends SurfaceView implements Runnable {
 
@@ -81,14 +80,25 @@ public class MapView extends SurfaceView implements Runnable {
     private int buildingSelectionIdx = 0;
 
     private enum BuildingSelection {
-        ROUND_TOWER(0), SQUARE_TOWER(1), POWER_GENERATOR(2),
-        BOAT(3), ANTI_TANK_TOWER(4), BARRACKS(5),
-        ICE_TOWER(6), VOLCANIC_TOWER(7), LASER_TOWER(8),
-        RADAR(9), WALL(10), AREA_DAMAGE_TOWER(11);
+        ROUND_TOWER(0, new RoundTowerBuildingStrategy()),
+        SQUARE_TOWER(1, new SquareTowerBuildingStrategy()),
+        POWER_GENERATOR(2, new PowerGeneratorBuildingStrategy()),
+        BOAT(3, new BoatBuildingStrategy()),
+        ANTI_TANK_TOWER(4, new AntiTankTowerBuildingStrategy()),
+        BARRACKS(5, new BarracksBuildingStrategy()),
+        ICE_TOWER(6, new IceTowerBuildingStrategy()),
+        VOLCANIC_TOWER(7, new VolcanicTowerBuildingStrategy()),
+        LASER_TOWER(8, new LaserTowerBuildingStrategy()),
+        RADAR(9, new RadarBuildingStrategy()),
+        WALL(10, new WallBuildingStrategy()),
+        AREA_DAMAGE_TOWER(11, new AreaDamageTowerBuildingStrategy());
 
         int index;
-        BuildingSelection(int idx)  {
+        BuildingStrategy buildingStrategy;
+
+        BuildingSelection(int idx, BuildingStrategy buildingStrategy)  {
             index = idx;
+            this.buildingStrategy = buildingStrategy;
         }
 
         public static BuildingSelection fromIndex(int idx) {
@@ -98,6 +108,10 @@ public class MapView extends SurfaceView implements Runnable {
                 }
             }
             return null;
+        }
+
+        public BuildingStrategy getBuildingStrategy() {
+            return buildingStrategy;
         }
     }
 
@@ -119,6 +133,8 @@ public class MapView extends SurfaceView implements Runnable {
                 return false;
             }
         });
+
+        final MapView thisMapView = this;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,109 +149,13 @@ public class MapView extends SurfaceView implements Runnable {
                     Boat boat = (Boat) selectedBuilding;
                     PointF boatPosition = boat.getPosition();
                     gameMap.moveBoat((int) boatPosition.x, (int) boatPosition.y, positionX, positionY);
+
                 } else {
-                    switch (BuildingSelection.fromIndex(buildingSelectionIdx)) {
+                    BuildingStrategy buildingStrategy =
+                            BuildingSelection.fromIndex(buildingSelectionIdx).getBuildingStrategy();
 
-                        case ROUND_TOWER:
-                            if (gold >= RoundTower.COST) {
-                                RoundTower roundTower = gameMap.buildRoundTower(positionX, positionY);
-                                if (roundTower != null) {
-                                    setGold(gold - roundTower.getCost());
-                                }
-                            }
-                            break;
-
-                        case SQUARE_TOWER:
-                            if (gold >= SquareTower.COST) {
-                                SquareTower squareTower = gameMap.buildSquareTower(positionX, positionY);
-                                if (squareTower != null) {
-                                    setGold(gold - squareTower.getCost());
-                                }
-                            }
-                            break;
-
-                        case POWER_GENERATOR:
-                            if (gold >= PowerGenerator.COST) {
-                                PowerGenerator generator = gameMap.buildPowerGenerator(positionX, positionY);
-                                if (generator != null) {
-                                    setGold(gold - generator.getCost());
-                                }
-                            }
-                            break;
-
-                        case BOAT:
-                            if (gold >= Boat.COST) {
-                                Boat boat = gameMap.buildBoat(positionX, positionY);
-                                if (boat != null) {
-                                    setGold(gold - boat.getCost());
-                                }
-                            }
-                            break;
-
-                        case ANTI_TANK_TOWER:
-                            if (gold >= AntiTankTower.COST) {
-                                AntiTankTower antiTankTower = gameMap.buildAntiTankTower(positionX, positionY);
-                                if (antiTankTower != null) {
-                                    setGold(gold - antiTankTower.getCost());
-                                }
-                            }
-                            break;
-                        case BARRACKS:
-                            if (gold >= AntiTankTower.COST) {
-                                Barracks barracks = gameMap.buildBarracks(positionX, positionY);
-                                if (barracks != null) {
-                                    setGold(gold - barracks.getCost());
-                                }
-                            }
-                            break;
-                        case ICE_TOWER:
-                            if (gold >= IceTower.COST) {
-                                IceTower iceTower = gameMap.buildIceTower(positionX, positionY);
-                                if (iceTower != null) {
-                                    setGold(gold - iceTower.getCost());
-                                }
-                            }
-                            break;
-                        case VOLCANIC_TOWER:
-                            if (gold >= VolcanicTower.COST) {
-                                VolcanicTower volcanicTower = gameMap.buildVolcanicTower(positionX, positionY);
-                                if (volcanicTower != null) {
-                                    setGold(gold - volcanicTower.getCost());
-                                }
-                            }
-                            break;
-                        case LASER_TOWER:
-                            if (gold >= LaserTower.COST) {
-                                LaserTower laserTower = gameMap.buildLaserTower(positionX, positionY);
-                                if (laserTower != null) {
-                                    setGold(gold - laserTower.getCost());
-                                }
-                            }
-                            break;
-                        case RADAR:
-                            if (gold >= Radar.COST) {
-                                Radar radar = gameMap.buildRadar(positionX, positionY);
-                                if (radar != null) {
-                                    setGold(gold - radar.getCost());
-                                }
-                            }
-                            break;
-                        case WALL:
-                            if (gold >= Wall.COST) {
-                                Wall wall = gameMap.buildWall(positionX, positionY);
-                                if (wall != null) {
-                                    setGold(gold - wall.getCost());
-                                }
-                            }
-                            break;
-                        case AREA_DAMAGE_TOWER:
-                            if (gold >= AreaDamageTower.COST) {
-                                AreaDamageTower areaDamageTower = gameMap.buildAreaDamageTower(positionX, positionY);
-                                if (areaDamageTower != null) {
-                                    setGold(gold - areaDamageTower.getCost());
-                                }
-                            }
-                            break;
+                    if (buildingStrategy.hasEnoughGold(thisMapView)) {
+                        buildingStrategy.build(thisMapView, positionX, positionY);
                     }
                 }
 
