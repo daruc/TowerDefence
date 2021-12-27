@@ -1,9 +1,12 @@
 package com.daruc.towerdefence.building;
 
 import android.graphics.PointF;
+import android.util.Pair;
 
 import com.daruc.towerdefence.Enemy;
 import com.daruc.towerdefence.GameMap;
+import com.daruc.towerdefence.MapDimensions;
+import com.daruc.towerdefence.MapLoader;
 import com.daruc.towerdefence.Vector;
 
 
@@ -64,9 +67,9 @@ public class Bullet {
     }
 
     public boolean isOutOfMap(GameMap gameMap) {
-        PointF mapDimensions = gameMap.mapDimensions();
-        return (position.x < 0f || position.x > mapDimensions.x ||
-                position.y < 0f || position.y > mapDimensions.y);
+        MapDimensions mapDimensions = gameMap.mapDimensions();
+        return (position.x < 0f || position.x > mapDimensions.width ||
+                position.y < 0f || position.y > mapDimensions.height);
     }
 
     public void reset() {

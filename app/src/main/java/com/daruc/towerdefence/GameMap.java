@@ -2,6 +2,7 @@ package com.daruc.towerdefence;
 
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.util.Pair;
 
 import com.daruc.towerdefence.building.antitanktower.AntiTankTower;
 import com.daruc.towerdefence.building.areadamagetower.AreaDamageTower;
@@ -34,7 +35,7 @@ public class GameMap {
     private List<Point> enemiesPath;
     private List<Enemy> enemies = new ArrayList<>();
     private List<Building> buildingsList = new ArrayList<>();
-    private PointF mapDimensions;
+    private MapDimensions mapDimensions;
 
     private int wave = 1;
     private int nEnemies = 3;
@@ -49,33 +50,10 @@ public class GameMap {
     }
 
     private void loadFromFile(InputStream mapResource) {
-        Scanner scanner = new Scanner(mapResource);
-        scanner.useDelimiter("\\A");
-        String mapStr = scanner.hasNext() ? scanner.next() : "";
-        mapStr = mapStr.trim();
-
-        int width = mapStr.indexOf("\r");
-        Matcher matcher = Pattern.compile("\r\n|\r|\n").matcher(mapStr);
-        int lines = 1;
-        while (matcher.find()) {
-            ++lines;
-        }
-        int height = lines;
-
-        StringBuffer stringBuffer = new StringBuffer();
-
-        mapStr = mapStr.replaceAll("\r\n|\r|\n", "");
-
-        groundTiles = new GroundType[height][];
-        for (int h = 0; h < height; ++h) {
-            groundTiles[h] = new GroundType[width];
-            for (int w = 0; w < width; ++w) {
-                int index = (h * width) + w;
-                groundTiles[h][w] = GroundType.fromChar(mapStr.charAt(index));
-            }
-        }
-
-        mapDimensions = new PointF(width, height);
+        MapLoader mapLoader = new MapLoader();
+        mapLoader.loadFromFile(mapResource);
+        groundTiles = mapLoader.getGroundTiles();
+        mapDimensions = mapLoader.getMapDimensions();
     }
 
     private void computeEnemiesPath() {
@@ -189,7 +167,7 @@ public class GameMap {
         return groundTiles[0].length;
     }
 
-    public PointF mapDimensions() {
+    public MapDimensions mapDimensions() {
         return mapDimensions;
     }
 
