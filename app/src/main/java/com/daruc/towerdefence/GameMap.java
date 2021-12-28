@@ -2,33 +2,18 @@ package com.daruc.towerdefence;
 
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.util.Pair;
 
-import com.daruc.towerdefence.building.antitanktower.AntiTankTower;
-import com.daruc.towerdefence.building.areadamagetower.AreaDamageTower;
-import com.daruc.towerdefence.building.barracks.Barracks;
-import com.daruc.towerdefence.building.boat.Boat;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.castle.Castle;
-import com.daruc.towerdefence.building.icetower.IceTower;
-import com.daruc.towerdefence.building.lasertower.LaserTower;
 import com.daruc.towerdefence.building.powergenerator.PowerGenerator;
 import com.daruc.towerdefence.building.PowerReceiver;
-import com.daruc.towerdefence.building.radar.Radar;
-import com.daruc.towerdefence.building.roundtower.RoundTower;
-import com.daruc.towerdefence.building.squaretower.SquareTower;
-import com.daruc.towerdefence.building.volcanictower.VolcanicTower;
-import com.daruc.towerdefence.building.wall.Wall;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GameMap {
+    public static final float ENEMY_WAITING_TIME_FACTOR = 70.0f;
     private GroundType[][] groundTiles;
     private Building[][] buildings;
 
@@ -61,7 +46,7 @@ public class GameMap {
         Point currentPoint = findOrigin();
         points.add(currentPoint);
 
-        while (getGround(currentPoint) != GroundType.CASTLE) {
+        while (isCastleReached(currentPoint)) {
             Point east = new Point(currentPoint);
             east.x -= 1;
             Point west = new Point(currentPoint);
@@ -71,28 +56,16 @@ public class GameMap {
             Point south = new Point(currentPoint);
             south.y += 1;
 
-            if (!points.contains(east) &&
-                    (getGround(east) == GroundType.PATH || getGround(east) == GroundType.CASTLE)) {
-
+            if (isNewPathVertex(points, east)) {
                 points.add(east);
                 currentPoint = east;
-
-            } else if (!points.contains(west) &&
-                    (getGround(west) == GroundType.PATH || getGround(west) == GroundType.CASTLE)) {
-
+            } else if (isNewPathVertex(points, west)) {
                 points.add(west);
                 currentPoint = west;
-
-            } else if (!points.contains(north) &&
-                    (getGround(north) == GroundType.PATH ||
-                            getGround(north) == GroundType.CASTLE)) {
-
+            } else if (isNewPathVertex(points, north)) {
                 points.add(north);
                 currentPoint = north;
-
-            } else if (!points.contains(south) &&
-                    (getGround(south) == GroundType.PATH || getGround(south) == GroundType.CASTLE)) {
-
+            } else if (isNewPathVertex(points, south)) {
                 points.add(south);
                 currentPoint = south;
             }
@@ -100,45 +73,80 @@ public class GameMap {
         enemiesPath = points;
     }
 
+    private boolean isNewPathVertex(List<Point> points, Point newVertex) {
+        return !points.contains(newVertex) &&
+               (getGround(newVertex) == GroundType.PATH ||
+               getGround(newVertex) == GroundType.CASTLE);
+    }
+
+    private boolean isCastleReached(Point currentPoint) {
+        return getGround(currentPoint) != GroundType.CASTLE;
+    }
+
     private Point findOrigin() {
         for (int i = 0; i < getHeight(); ++i) {
-            if (getGround(0, i) == GroundType.PATH) {
+            if (isPathOnLeftEdge(i)) {
                 return new Point(0, i);
             }
 
-            if (getGround(getWidth() - 1, i) == GroundType.PATH) {
+            if (isPathOnRightEdge(i)) {
                 return new Point(getWidth()-1, i);
             }
         }
 
         for (int i = 0; i < getWidth(); ++i) {
-            if (getGround(i, 0) == GroundType.PATH) {
+            if (isPathOnTopEdge(i)) {
                 return new Point(i, 0);
             }
 
-            if (getGround(i, getHeight() - 1) == GroundType.PATH) {
+            if (isPathOnBottomEdge(i)) {
                 return new Point (i, getHeight() - 1);
             }
         }
         throw new IllegalStateException("Map doesn't have path origin.");
     }
 
-    private void addEnemies() {
+    private boolean isPathOnLeftEdge(int mapPointY) {
+        return getGround(0, mapPointY) == GroundType.PATH;
+    }
 
+    private boolean isPathOnRightEdge(int mapPointY) {
+        return getGround(getWidth() - 1, mapPointY) == GroundType.PATH;
+    }
+
+    private boolean isPathOnTopEdge(int mapPointX) {
+        return getGround(mapPointX, 0) == GroundType.PATH;
+    }
+
+    private boolean isPathOnBottomEdge(int mapPointX) {
+        return getGround(mapPointX, getHeight() - 1) == GroundType.PATH;
+    }
+
+    private void addEnemies() {
         for (int i = 0; i < nEnemies; ++i) {
-            float waitingTime = i * (70.0f / speed);
+            float waitingTime = calculateEnemyWaitingTime(i);
             Enemy enemy = new Enemy(enemiesPath, waitingTime);
             enemies.add(enemy);
         }
     }
 
+    private float calculateEnemyWaitingTime(int numberInLine) {
+        return numberInLine * (ENEMY_WAITING_TIME_FACTOR / speed);
+    }
+
     private void initBuildings() {
+        initBuildingsArray();
+        initCastle();
+    }
+
+    private void initBuildingsArray() {
         buildings = new Building[getHeight()][];
         for (int i = 0; i < getHeight(); ++i) {
             buildings[i] = new Building[getWidth()];
         }
+    }
 
-        // find castle
+    private void initCastle() {
         for (int h = 0; h < getHeight(); ++h) {
             for (int w = 0; w < getWidth(); ++w) {
                 if (groundTiles[h][w] == GroundType.CASTLE) {

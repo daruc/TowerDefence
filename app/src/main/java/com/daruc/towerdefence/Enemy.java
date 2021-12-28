@@ -158,4 +158,6 @@ public class Enemy implements Updatable {
     public void setSpeed(float speed) {
         this.speed = speed;
     }
+
+
 }
