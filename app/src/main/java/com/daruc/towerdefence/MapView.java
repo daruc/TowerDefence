@@ -140,6 +140,7 @@ public class MapView extends SurfaceView implements Runnable {
             public void onClick(View v) {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
+                MapPoint mapPoint = new MapPoint(positionX, positionY);
 
                 if (positionX >= gameMap.getWidth() || positionY >= gameMap.getHeight()) {
                     return;
@@ -147,23 +148,22 @@ public class MapView extends SurfaceView implements Runnable {
 
                 if (selectedBuilding instanceof Boat) {
                     Boat boat = (Boat) selectedBuilding;
-                    PointF boatPosition = boat.getPosition();
-                    gameMap.moveBoat((int) boatPosition.x, (int) boatPosition.y, positionX, positionY);
+                    boat.move(mapPoint);
 
                 } else {
                     BuildingStrategy buildingStrategy =
                             BuildingSelection.fromIndex(buildingSelectionIdx).getBuildingStrategy();
 
                     if (buildingStrategy.hasEnoughGold(thisMapView)) {
-                        buildingStrategy.build(thisMapView, positionX, positionY);
+                        buildingStrategy.build(thisMapView, mapPoint);
                     }
                 }
 
-                Building newSelectedBuilding = gameMap.getBuilding(positionX, positionY);
+                Building newSelectedBuilding = gameMap.getBuilding(mapPoint);
                 if (newSelectedBuilding == selectedBuilding) {
                     selectedBuilding = null;
                 } else {
-                    selectedBuilding = gameMap.getBuilding(positionX, positionY);
+                    selectedBuilding = gameMap.getBuilding(mapPoint);
                 }
             }
         });
@@ -173,8 +173,9 @@ public class MapView extends SurfaceView implements Runnable {
             public boolean onLongClick(View v) {
                 int positionX = (int) (touchCoordinates.x / tileSize);
                 int positionY = (int) (touchCoordinates.y / tileSize);
+                MapPoint mapPoint = new MapPoint(positionX, positionY);
 
-                Building building = gameMap.getBuilding(positionX, positionY);
+                Building building = gameMap.getBuilding(mapPoint);
                 if (building != null && !(building instanceof Castle)) {
                     int cost = building.getCost() / 2;
                     if (gold >= cost) {

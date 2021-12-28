@@ -4,6 +4,7 @@ import android.graphics.PointF;
 
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.GroundType;
+import com.daruc.towerdefence.MapPoint;
 import com.daruc.towerdefence.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
@@ -17,14 +18,15 @@ public class RoundTowerBuildingStrategy implements BuildingStrategy {
     }
 
     @Override
-    public void build(MapView mapView, int mapX, int mapY) {
+    public void build(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
-        GroundType groundType = gameMap.getGround(mapX, mapY);
-        Building building = gameMap.getBuilding(mapX, mapY);
+        GroundType groundType = gameMap.getGround(mapPoint);
+        Building building = gameMap.getBuilding(mapPoint);
 
         if (groundType == GroundType.GRASS && building == null) {
-            RoundTower roundTower = new RoundTower(new PointF(mapX + 0.5f, mapY + 0.5f));
-            gameMap.setBuilding(mapX, mapY, roundTower);
+            RoundTower roundTower = new RoundTower(new PointF(mapPoint.getX() + 0.5f,
+                    mapPoint.getY() + 0.5f));
+            gameMap.setBuilding(mapPoint, roundTower);
             mapView.setGold(mapView.getGold() - RoundTower.COST);
 
             //PowerGenerator powerGenerator = findPowerGenerator(x, y);

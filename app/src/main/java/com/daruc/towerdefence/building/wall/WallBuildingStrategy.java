@@ -4,6 +4,7 @@ import android.graphics.PointF;
 
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.GroundType;
+import com.daruc.towerdefence.MapPoint;
 import com.daruc.towerdefence.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
@@ -16,14 +17,14 @@ public class WallBuildingStrategy implements BuildingStrategy {
     }
 
     @Override
-    public void build(MapView mapView, int mapX, int mapY) {
+    public void build(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
-        GroundType groundType = gameMap.getGround(mapX, mapY);
-        Building building = gameMap.getBuilding(mapX, mapY);
+        GroundType groundType = gameMap.getGround(mapPoint);
+        Building building = gameMap.getBuilding(mapPoint);
 
         if (groundType == GroundType.PATH && building == null) {
-            Wall wall = new Wall(new PointF(mapX + 0.5f, mapY + 0.5f));
-            gameMap.setBuilding(mapX, mapY, wall);
+            Wall wall = new Wall(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+            gameMap.setBuilding(mapPoint, wall);
             mapView.setGold(mapView.getGold() - Wall.COST);
         }
     }

@@ -1,6 +1,8 @@
 package com.daruc.towerdefence;
 
 
+import android.graphics.PointF;
+
 public class MapPoint {
     private int x;
     private int y;
@@ -8,6 +10,11 @@ public class MapPoint {
     public MapPoint(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public MapPoint(PointF pointF) {
+        x = (int) pointF.x;
+        y = (int) pointF.y;
     }
 
     public int getX() {

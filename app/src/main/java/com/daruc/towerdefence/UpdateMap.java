@@ -124,7 +124,7 @@ public class UpdateMap {
     }
 
     private void updateBoat(Boat boat) {
-        boat.move(refreshTime);
+        boat.update(refreshTime);
     }
 
     public void stop() {

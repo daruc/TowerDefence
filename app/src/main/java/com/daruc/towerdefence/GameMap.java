@@ -155,6 +155,10 @@ public class GameMap {
         return groundTiles[y][x];
     }
 
+    public GroundType getGround(MapPoint mapPoint) {
+        return getGround(mapPoint.getX(), mapPoint.getY());
+    }
+
     public GroundType getGround(Point point) {
         return getGround(point.x, point.y);
     }
@@ -223,23 +227,57 @@ public class GameMap {
                 y < 0 || y >= getHeight());
     }
 
-    public boolean isNextToPath(int x, int y) {
+    public boolean isNextToPath(MapPoint mapPoint) {
+        int x = mapPoint.getX();
+        int y = mapPoint.getY();
+
         return (!isOutOfTiles(x, y - 1) && groundTiles[y - 1][x] == GroundType.PATH) ||
                 (!isOutOfTiles(x, y + 1) && groundTiles[y + 1][x] == GroundType.PATH) ||
                 (!isOutOfTiles(x - 1, y) && groundTiles[y][x - 1] == GroundType.PATH) ||
                 (!isOutOfTiles(x + 1, y) && groundTiles[y][x + 1] == GroundType.PATH);
     }
 
-    public Building getBuilding(int x, int y) {
-        if (x < 0 || x > getWidth() || y < 0 || y > getHeight()) {
+    public Building getBuilding(MapPoint mapPoint) {
+        if (mapPoint.getX() < 0 ||
+                mapPoint.getX() > getWidth() ||
+                mapPoint.getY() < 0 ||
+                mapPoint.getY() > getHeight()) {
             return null;
         }
-        return buildings[y][x];
+        return buildings[mapPoint.getY()][mapPoint.getX()];
     }
 
-    public void setBuilding(int mapX, int mapY, Building building) {
-        buildings[mapY][mapX] = building;
+    public void setBuilding(MapPoint mapPoint, Building building) {
+        buildings[mapPoint.getY()][mapPoint.getX()] = building;
         buildingsList.add(building);
+    }
+
+    public void moveBuilding(MapPoint currentPosition, MapPoint newPosition) {
+        Building currentPositionBuilding
+                = buildings[currentPosition.getY()][currentPosition.getX()];
+
+        Building newPositionBuilding
+                = buildings[newPosition.getY()][newPosition.getX()];
+
+        throwIfThereIsNoBuilding(currentPositionBuilding);
+        throwIfNewPositionIsOccupied(newPositionBuilding);
+
+        buildings[newPosition.getY()][newPosition.getX()]
+                = buildings[currentPosition.getY()][currentPosition.getX()];
+    }
+
+    private void throwIfThereIsNoBuilding(Building currentPositionBuilding) {
+        if (currentPositionBuilding == null) {
+            throw new RuntimeException(
+                    "Can not move building: there is no building in the current position.");
+        }
+    }
+
+    private void throwIfNewPositionIsOccupied(Building newPositionBuilding) {
+        if (newPositionBuilding != null) {
+            throw new RuntimeException(
+                    "Can not move building: there is already a building in the new position.");
+        }
     }
 
     public List<Building> getBuildings() {
@@ -252,7 +290,7 @@ public class GameMap {
                 return (Castle) building;
             }
         }
-        return null;
+        throw new RuntimeException("Castle not found.");
     }
 
     public boolean removeBuilding(int x, int y) {
@@ -320,52 +358,6 @@ public class GameMap {
             enemy.setSpeed(speed);
             enemies.add(enemy);
         }
-    }
-
-    public Boat moveBoat(int oldPositionX, int oldPositionY, int newPositionX, int newPositionY) {
-        Building building = buildings[oldPositionY][oldPositionX];
-        if (building instanceof Boat && buildings[newPositionY][newPositionX] == null
-                && groundTiles[newPositionY][newPositionX] == GroundType.WATER) {
-            Boat boat = (Boat) building;
-
-            List<MapPoint> moveBoatPath = moveBoatPath(new MapPoint(oldPositionX, oldPositionY),
-                    new MapPoint(newPositionX, newPositionY));
-
-            if (moveBoatPath != null) {
-                List<PointF> pointFMoveBoatPath = new LinkedList<>();
-                for (MapPoint mapPoint : moveBoatPath) {
-                    PointF pointF = new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f);
-                    pointFMoveBoatPath.add(pointF);
-                }
-                boat.setPath(pointFMoveBoatPath);
-
-                buildings[newPositionY][newPositionX] = boat;
-                buildings[oldPositionY][oldPositionX] = null;
-                return boat;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private List<MapPoint> moveBoatPath(MapPoint source, MapPoint destination) {
-        boolean map[][] = new boolean[getHeight()][];
-        for (int h = 0; h < getHeight(); ++h) {
-            map[h] = new boolean[getWidth()];
-            for (int w = 0; w < getWidth(); ++w) {
-                if (groundTiles[h][w] == GroundType.WATER && buildings[h][w] == null) {
-                    map[h][w] = true;
-                } else {
-                    map[h][w] = false;
-                }
-            }
-        }
-
-        AStarPathFinder aStarPathFinder = new AStarPathFinder(map);
-
-        return aStarPathFinder.find(source, destination);
     }
 
     public GroundType[][] getGroundTiles() {
