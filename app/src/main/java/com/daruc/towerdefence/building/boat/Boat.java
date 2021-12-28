@@ -7,6 +7,7 @@ import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.GroundType;
 import com.daruc.towerdefence.MapDimensions;
 import com.daruc.towerdefence.MapPoint;
+import com.daruc.towerdefence.Updatable;
 import com.daruc.towerdefence.Vector;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.Upgradable;
@@ -15,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class Boat extends Building implements Upgradable {
+public class Boat extends Building implements Upgradable, Updatable {
 
     private static final int MAX_LEVEL = 10;
     public static final int COST = 250;
@@ -64,10 +65,10 @@ public class Boat extends Building implements Upgradable {
         movePath = path;
     }
 
-    public void update(long deltaTimeMillis) {
+    public void update(float deltaTimeSeconds) {
         if (isMoving()) {
             Vector direction = calculateDirection();
-            Vector offset = direction.multiply((deltaTimeMillis / 1000.0f) * moveSpeed);
+            Vector offset = direction.multiply(deltaTimeSeconds * moveSpeed);
             PointF offsetPointF = offset.convertToPointF();
             position.x += offsetPointF.x;
             position.y += offsetPointF.y;

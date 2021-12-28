@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class Enemy {
+public class Enemy implements Updatable {
     private PointF position;
     private Iterator<PointF> nextPositionIt;
     private PointF nextPosition;
@@ -19,7 +19,7 @@ public class Enemy {
     private float waitingTimeSec;
 
     private float radius = 0.1f;
-    private float speed = 1f;
+    private float speed = 0.01f;
     private int health = 10;
 
     public Enemy(List<Point> pEnemiesPath) {
@@ -27,18 +27,28 @@ public class Enemy {
     }
 
     public Enemy(List<Point> pEnemiesPath, float waitingTimeSec) {
-
         this.waitingTimeSec = waitingTimeSec;
+        enemiesPath = mapEnemiesPath(pEnemiesPath);
+        initNextPosition();
+        initPosition();
+    }
 
-        enemiesPath = new ArrayList<>(pEnemiesPath.size());
-        for (Point point : pEnemiesPath) {
-            enemiesPath.add(new PointF(point.x + 0.5f, point.y + 0.5f));
+    private List<PointF> mapEnemiesPath(List<Point> enemiesPath) {
+        List<PointF> result = new ArrayList<>(enemiesPath.size());
+        for (Point point : enemiesPath) {
+            result.add(new PointF(point.x + 0.5f, point.y + 0.5f));
         }
+        return result;
+    }
 
+    private void initNextPosition() {
         nextPositionIt = enemiesPath.iterator();
         if (nextPositionIt.hasNext()) {
             nextPosition = nextPositionIt.next();
         }
+    }
+
+    private void initPosition() {
         this.position = new PointF(nextPosition.x, nextPosition.y);
         if (position.x == 0.5f) {
             position.x = -0.5f;
@@ -51,37 +61,45 @@ public class Enemy {
         return position;
     }
 
-    public void move(long deltaTimeMillis) {
-        float deltaTimeSec = deltaTimeMillis / 1000f;
+    public void update(float deltaTimeSeconds) {
 
-        if (deltaTimeSec <= waitingTimeSec) {
-            waitingTimeSec -= deltaTimeSec;
+        if (deltaTimeSeconds <= waitingTimeSec) {
+            waitingTimeSec -= deltaTimeSeconds;
             return;
         }
 
-        float displacement = speed * deltaTimeSec;
-        if (Math.abs(position.x - nextPosition.x) < displacement &&
-            Math.abs(position.y - nextPosition.y) < displacement) {  // new position
+        float displacement = speed * deltaTimeSeconds;
+        updateNextPositionIfDestinationAchieved(displacement);
+        updatePosition(displacement);
+    }
 
-            position = nextPosition;
-            if (nextPositionIt.hasNext()) {
-                nextPosition = nextPositionIt.next();
-            } else {
-                nextPosition = position;
-            }
-
-        }else if (position.x < nextPosition.x) {  // move right
-            position.x += displacement;
-
-        } else if (position.x > nextPosition.x) {   // move left
-            position.x -= displacement;
-
-        } else if (position.y < nextPosition.y) {   // move down
-            position.y += displacement;
-
-        } else {   // move up
-            position.y -= displacement;
+    private void updateNextPositionIfDestinationAchieved(float displacement) {
+        if (isDestinationAchieved(displacement)) {
+            updateNextPosition();
         }
+    }
+
+    private boolean isDestinationAchieved(float displacement) {
+        return Math.abs(position.x - nextPosition.x) < displacement &&
+                Math.abs(position.y - nextPosition.y) < displacement;
+    }
+
+    private void updateNextPosition() {
+        position = nextPosition;
+        if (nextPositionIt.hasNext()) {
+            nextPosition = nextPositionIt.next();
+        } else {
+            nextPosition = position;
+        }
+    }
+
+    private void updatePosition(float displacement) {
+        Vector currentPosition = new Vector(position);
+        Vector destinationPosition = new Vector(nextPosition);
+        Vector direction = destinationPosition.minus(currentPosition).getUnitVector();
+        Vector displacementVector = direction.multiply(displacement);
+        position.x += displacementVector.getX();
+        position.y += displacementVector.getY();
     }
 
     public float getRadius() {

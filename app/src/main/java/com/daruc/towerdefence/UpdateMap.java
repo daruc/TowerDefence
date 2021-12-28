@@ -16,7 +16,7 @@ public class UpdateMap {
 
     private MapView mapView;
     private GameMap gameMap;
-    private long refreshTime = 20;
+    private float refreshTimeSeconds = 20;
     private int soundId;
     private Context context;
     private SoundPool soundPool;
@@ -35,17 +35,18 @@ public class UpdateMap {
         long lastStepRefreshTime = pRefreshTime % REFRESH_TIME;
 
         long singleStepRefreshTime = pRefreshTime / steps;
+        float singleStepDeltaSeconds = singleStepRefreshTime / 1000f;
         for (int i = 0; i < steps; ++i) {
-            updateSingleStep(singleStepRefreshTime);
+            updateSingleStep(singleStepDeltaSeconds);
         }
         updateSingleStep(lastStepRefreshTime);
     }
 
-    private void updateSingleStep(long refreshTime) {
-        this.refreshTime = refreshTime;
+    private void updateSingleStep(float refreshTimeSeconds) {
+        this.refreshTimeSeconds = refreshTimeSeconds;
         for (Enemy enemy: gameMap.getEnemies()) {
             if (enemy.isActive()) {
-                enemy.move(refreshTime);
+                enemy.update(refreshTimeSeconds);
                 if (enemy.castleCollision(gameMap.getCastle())) {
                     enemy.decreaseHealth(100);
                     gameMap.getCastle().decreaseHealth(1);
@@ -84,7 +85,7 @@ public class UpdateMap {
             } else if (bullet.hasTarget() && bullet.getTarget().isDead()) {
                 bullet.reset();
             }
-            bullet.move(refreshTime);
+            bullet.update(refreshTimeSeconds);
 
             if (bullet.collision()) {
                 Enemy target = bullet.getTarget();
@@ -110,7 +111,7 @@ public class UpdateMap {
                 Direction direction = squareTower.findEnemies(gameMap.getEnemies());
                 rocket.setDirection(direction);
             }
-            rocket.move(refreshTime);
+            rocket.update(refreshTimeSeconds);
             Enemy victim = rocket.collision(gameMap.getEnemies());
             if (victim != null) {
                 victim.decreaseHealth(rocket.getDamage());
@@ -124,7 +125,7 @@ public class UpdateMap {
     }
 
     private void updateBoat(Boat boat) {
-        boat.update(refreshTime);
+        boat.update(refreshTimeSeconds);
     }
 
     public void stop() {

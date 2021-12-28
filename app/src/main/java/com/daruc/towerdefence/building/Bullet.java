@@ -29,15 +29,15 @@ public class Bullet {
         return position;
     }
 
-    public void move(long deltaTimeMillis) {
+    public void update(float deltaTimeSeconds) {
 
         if (hasTarget()) {
             direction = calculateDirection();
-            float displacement = ((float) deltaTimeMillis / 1000) * speed;
+            float displacement = deltaTimeSeconds * speed;
             position.x += direction.x * displacement;
             position.y += direction.y * displacement;
         } else if (!free) {
-            moveStraight(deltaTimeMillis);
+            moveStraight(deltaTimeSeconds);
         }
     }
 
@@ -47,8 +47,8 @@ public class Bullet {
         return targetVector.minus(positionVector).getUnitVector().convertToPointF();
     }
 
-    public void moveStraight(long deltaTimeMillis) {
-        float displacement = (deltaTimeMillis / 1000) * speed;
+    public void moveStraight(float deltaTimeSeconds) {
+        float displacement = deltaTimeSeconds * speed;
         position.x += direction.x * displacement;
         position.y += direction.y * displacement;
     }
@@ -63,7 +63,7 @@ public class Bullet {
     }
 
     public boolean hasTarget() {
-        return target!= null;
+        return target != null;
     }
 
     public boolean isOutOfMap(GameMap gameMap) {

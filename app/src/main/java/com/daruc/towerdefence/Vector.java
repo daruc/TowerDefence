@@ -47,5 +47,13 @@ public class Vector {
     public PointF convertToPointF() {
         return new PointF(x, y);
     }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
 }
 

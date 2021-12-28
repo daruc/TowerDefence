@@ -126,7 +126,7 @@ public class GameMap {
     private void addEnemies() {
 
         for (int i = 0; i < nEnemies; ++i) {
-            float waitingTime = i * (0.7f / speed);
+            float waitingTime = i * (70.0f / speed);
             Enemy enemy = new Enemy(enemiesPath, waitingTime);
             enemies.add(enemy);
         }

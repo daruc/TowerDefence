@@ -8,12 +8,13 @@ import com.daruc.towerdefence.Enemy;
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.MapDimensions;
 import com.daruc.towerdefence.MapLoader;
+import com.daruc.towerdefence.Updatable;
 import com.daruc.towerdefence.Vector;
 
 import java.util.List;
 
 
-public class Rocket {
+public class Rocket implements Updatable {
     private PointF position;
     private final PointF towerPosition;
     private Direction direction;
@@ -27,12 +28,12 @@ public class Rocket {
         position = new PointF(towerPosition.x, towerPosition.y);
     }
 
-    public void move(long deltaTimeMillis) {
+    public void update(float deltaTimeSeconds) {
         if (direction == null) {
             return;
         }
 
-        float displacement = (deltaTimeMillis / 1000f) * speed;
+        float displacement = deltaTimeSeconds * speed;
 
         switch (direction) {
             case RIGHT:
