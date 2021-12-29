@@ -64,13 +64,6 @@ public class MapView extends SurfaceView implements Runnable {
     private UpdateMap updateMap;
 
     private Paint paintGroundLine;
-    private Paint paintEnemy;
-
-    private Bitmap grassBitmap;
-    private Bitmap waterBitmap;
-    private Bitmap forestBitmap;
-    private Bitmap pathBitmap;
-    private Bitmap stoneBitmap;
 
     private Bitmap roundTowerBitmap;
     private Bitmap squareTowerBitmap;
@@ -209,16 +202,6 @@ public class MapView extends SurfaceView implements Runnable {
         paintGroundLine.setColor(Color.argb(128, 160, 160, 160));
         paintGroundLine.setStrokeWidth(3f);
 
-        paintEnemy = new Paint();
-        paintEnemy.setColor(Color.BLACK);
-        paintEnemy.setStyle(Paint.Style.FILL);
-
-        grassBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
-        pathBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.path);
-        stoneBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.stone);
-        waterBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.water);
-        forestBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.forest);
-
         roundTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.round_tower);
         squareTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.square_tower);
         powerGeneratorBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.power_generator);
@@ -252,30 +235,8 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     private void drawGroundTile(Canvas canvas, int tileX, int tileY, GroundType type) {
-        Rect source = new Rect(0, 0, grassBitmap.getWidth(), grassBitmap.getHeight());
-        RectF dest = new RectF(tileX, tileY, tileX + tileSize, tileY + tileSize);
-        switch (type) {
-            case PATH:
-                canvas.drawBitmap(pathBitmap, source, dest, paint);
-                break;
-            case GRASS:
-                canvas.drawBitmap(grassBitmap, source, dest, paint);
-                break;
-            case STONE:
-                canvas.drawBitmap(stoneBitmap, source, dest, paint);
-                break;
-            case WATER:
-                canvas.drawBitmap(waterBitmap, source, dest, paint);
-                break;
-            case CASTLE:
-                paint.setColor(Color.RED);
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawRect(new Rect(tileX, tileY, tileX + tileSize, tileY + tileSize), paint);
-                break;
-            case FOREST:
-                canvas.drawBitmap(forestBitmap, source, dest, paint);
-                break;
-        }
+        MapPoint mapPoint = new MapPoint(tileX, tileY);
+        type.getDrawingStrategy().draw(canvas, this, mapPoint);
     }
 
     private void drawGroundLines(Canvas canvas) {
@@ -296,15 +257,9 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     private void drawEnemies(Canvas canvas) {
-
         for (Enemy enemy : gameMap.getEnemies()) {
             if (enemy.isActive()) {
-                PointF position = enemy.getPosition();
-                position = new PointF(position.x, position.y);
-                position.x *= tileSize;
-                position.y *= tileSize;
-                canvas.drawCircle(position.x, position.y, enemy.getRadius() * tileSize,
-                        paintEnemy);
+                enemy.getDrawingStrategy().draw(canvas, this);
             }
         }
     }

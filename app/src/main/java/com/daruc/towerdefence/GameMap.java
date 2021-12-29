@@ -147,15 +147,26 @@ public class GameMap {
     }
 
     private void initCastle() {
+        MapPoint mapPoint = findCastleCoordinates();
+        PointF pointF = new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f);
+        buildings[mapPoint.getY()][mapPoint.getX()] = new Castle(pointF);
+        buildingsList.add(buildings[mapPoint.getY()][mapPoint.getX()]);
+    }
+
+    private MapPoint findCastleCoordinates() {
         for (int h = 0; h < getHeight(); ++h) {
             for (int w = 0; w < getWidth(); ++w) {
-                if (groundTiles[h][w] == GroundType.CASTLE) {
-                    buildings[h][w] = new Castle(new PointF(w + 0.5f, h + 0.5f));
-                    buildingsList.add(buildings[h][w]);
-                    return;
+                MapPoint mapPoint = new MapPoint(w, h);
+                if (isCastle(mapPoint)) {
+                    return mapPoint;
                 }
             }
         }
+        throw new RuntimeException("Map does not contain the castle.");
+    }
+
+    private boolean isCastle(MapPoint mapPoint) {
+        return groundTiles[mapPoint.getY()][mapPoint.getX()] == GroundType.CASTLE;
     }
 
     public GroundType getGround(int x, int y) {
@@ -185,49 +196,6 @@ public class GameMap {
 
     public List<Enemy> getEnemies() {
         return enemies;
-    }
-
-    private void connectPowerGenerator(int generatorX, int generatorY) {
-
-        for (int x = -1; x < 2; ++x) {
-            for (int y = -1; y < 2; ++y) {
-                int receiverX = generatorX + x;
-                int receiverY = generatorY + y;
-
-                if (isOutOfTiles(receiverX, receiverY)) {
-                    continue;
-                }
-
-                if (buildings[generatorY + y][generatorX + x] instanceof PowerReceiver) {
-                    PowerReceiver powerReceiver =
-                            (PowerReceiver) buildings[generatorY + y][generatorX + x];
-                    
-                    powerReceiver.
-                            setPowerGenerator((PowerGenerator) buildings[generatorY][generatorX]);
-                }
-            }
-        }
-    }
-
-    private PowerGenerator findPowerGenerator(int buildingX, int buildingY) {
-
-        int generatorX, generatorY;
-
-        for (int x = -1; x < 2; ++x) {
-            for (int y = -1; y < 2; ++y) {
-                generatorX = buildingX + x;
-                generatorY = buildingY + y;
-
-                if (isOutOfTiles(generatorX, generatorY)) {
-                    continue;
-                }
-
-                if (buildings[generatorY][generatorX] instanceof PowerGenerator) {
-                    return (PowerGenerator) buildings[generatorY][generatorX];
-                }
-            }
-        }
-        return null;
     }
 
     private boolean isOutOfTiles(int x, int y) {

@@ -1,13 +1,28 @@
 package com.daruc.towerdefence;
 
 
+import com.daruc.towerdefence.groundtile.ForestTileDrawingStrategy;
+import com.daruc.towerdefence.groundtile.GrassTileDrawingStrategy;
+import com.daruc.towerdefence.groundtile.GroundTileDrawingStrategy;
+import com.daruc.towerdefence.groundtile.PathTileDrawingStrategy;
+import com.daruc.towerdefence.groundtile.StoneTileDrawingStrategy;
+import com.daruc.towerdefence.groundtile.WaterTileDrawingStrategy;
+
+
 public enum GroundType {
-    WATER('W'), GRASS('G'), PATH('R'), STONE('S'), FOREST('F'), CASTLE('C');
+    WATER('W', new WaterTileDrawingStrategy()),
+    GRASS('G', new GrassTileDrawingStrategy()),
+    PATH('R', new PathTileDrawingStrategy()),
+    STONE('S', new StoneTileDrawingStrategy()),
+    FOREST('F', new ForestTileDrawingStrategy()),
+    CASTLE('C', new PathTileDrawingStrategy());
 
     private char ch;
+    private GroundTileDrawingStrategy groundTileDrawingStrategy;
 
-    GroundType(char ch) {
+    GroundType(char ch, GroundTileDrawingStrategy groundTileDrawingStrategy) {
         this.ch = ch;
+        this.groundTileDrawingStrategy = groundTileDrawingStrategy;
     }
 
     public char getChar() {
@@ -21,5 +36,9 @@ public enum GroundType {
             }
         }
         throw new IllegalArgumentException("Cannot find GroundType by char '" + ch + "'.");
+    }
+
+    public GroundTileDrawingStrategy getDrawingStrategy() {
+        return groundTileDrawingStrategy;
     }
 }

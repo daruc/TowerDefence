@@ -22,6 +22,8 @@ public class Enemy implements Updatable {
     private float speed = 0.01f;
     private int health = 10;
 
+    private DrawingStrategy drawingStrategy;
+
     public Enemy(List<Point> pEnemiesPath) {
         this(pEnemiesPath, 0f);
     }
@@ -29,6 +31,7 @@ public class Enemy implements Updatable {
     public Enemy(List<Point> pEnemiesPath, float waitingTimeSec) {
         this.waitingTimeSec = waitingTimeSec;
         enemiesPath = mapEnemiesPath(pEnemiesPath);
+        drawingStrategy = new EnemyDrawingStrategy(this);
         initNextPosition();
         initPosition();
     }
@@ -159,5 +162,7 @@ public class Enemy implements Updatable {
         this.speed = speed;
     }
 
-
+    public DrawingStrategy getDrawingStrategy() {
+        return drawingStrategy;
+    }
 }
