@@ -1,12 +1,11 @@
 package com.daruc.towerdefence.building.areadamagetower;
 
 import android.graphics.PointF;
-import android.hardware.Camera;
 
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.GroundType;
 import com.daruc.towerdefence.MapPoint;
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
 

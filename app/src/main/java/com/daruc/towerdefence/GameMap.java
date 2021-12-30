@@ -269,14 +269,14 @@ public class GameMap {
         throw new RuntimeException("Castle not found.");
     }
 
-    public boolean removeBuilding(int x, int y) {
-        boolean result = (buildings[y][x] != null);
-        buildingsList.remove(buildings[y][x]);
+    public boolean removeBuilding(MapPoint mapPoint) {
+        boolean result = (buildings[mapPoint.getY()][mapPoint.getX()] != null);
+        buildingsList.remove(buildings[mapPoint.getY()][mapPoint.getX()]);
 
-        if (buildings[y][x] instanceof PowerGenerator) {
-            disconnectPowerGenerator(x, y); // fix it
+        if (buildings[mapPoint.getY()][mapPoint.getX()] instanceof PowerGenerator) {
+            disconnectPowerGenerator(mapPoint.getX(), mapPoint.getY()); // fix it
         }
-        buildings[y][x] = null;
+        buildings[mapPoint.getY()][mapPoint.getX()] = null;
         return result;
     }
 

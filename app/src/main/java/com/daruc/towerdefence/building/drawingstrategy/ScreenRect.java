@@ -3,7 +3,7 @@ package com.daruc.towerdefence.building.drawingstrategy;
 import android.graphics.PointF;
 import android.graphics.RectF;
 
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 
 public class ScreenRect {
 

@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.drawingstrategy.BuildingDrawingStrategy;
 

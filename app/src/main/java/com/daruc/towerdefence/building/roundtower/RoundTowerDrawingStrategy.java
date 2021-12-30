@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.daruc.towerdefence.building.BuildingBitmapRect;
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.Bullet;
 import com.daruc.towerdefence.building.drawingstrategy.BuildingDrawingStrategy;

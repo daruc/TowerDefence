@@ -7,7 +7,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.daruc.towerdefence.MapPoint;
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 
 public abstract class GroundTileDrawingStrategy {
 

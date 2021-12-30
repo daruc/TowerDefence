@@ -10,6 +10,7 @@ import com.daruc.towerdefence.building.Bullet;
 import com.daruc.towerdefence.building.Rocket;
 import com.daruc.towerdefence.building.roundtower.RoundTower;
 import com.daruc.towerdefence.building.squaretower.SquareTower;
+import com.daruc.towerdefence.mapview.MapView;
 
 public class UpdateMap {
     private static final long REFRESH_TIME = 20;

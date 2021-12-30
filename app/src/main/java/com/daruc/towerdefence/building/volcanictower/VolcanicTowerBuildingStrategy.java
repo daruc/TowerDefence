@@ -5,10 +5,9 @@ import android.graphics.PointF;
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.GroundType;
 import com.daruc.towerdefence.MapPoint;
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
-import com.daruc.towerdefence.building.roundtower.RoundTower;
 
 public class VolcanicTowerBuildingStrategy implements BuildingStrategy {
     @Override

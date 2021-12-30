@@ -4,10 +4,9 @@ import android.graphics.PointF;
 
 import com.daruc.towerdefence.GroundType;
 import com.daruc.towerdefence.MapPoint;
-import com.daruc.towerdefence.MapView;
+import com.daruc.towerdefence.mapview.MapView;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
-import com.daruc.towerdefence.building.squaretower.SquareTower;
 
 public class SquareTowerBuildingStrategy implements BuildingStrategy {
     @Override

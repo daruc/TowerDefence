@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
+import com.daruc.towerdefence.mapview.MapView;
+
 
 public class EnemyDrawingStrategy implements DrawingStrategy {
 

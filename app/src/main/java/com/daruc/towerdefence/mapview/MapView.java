@@ -1,4 +1,4 @@
-package com.daruc.towerdefence;
+package com.daruc.towerdefence.mapview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,26 +7,27 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.TextView;
 
+import com.daruc.towerdefence.Enemy;
+import com.daruc.towerdefence.GameMap;
+import com.daruc.towerdefence.GameView;
+import com.daruc.towerdefence.GroundType;
+import com.daruc.towerdefence.MapPoint;
+import com.daruc.towerdefence.R;
+import com.daruc.towerdefence.UpdateMap;
 import com.daruc.towerdefence.building.antitanktower.AntiTankTowerBuildingStrategy;
 import com.daruc.towerdefence.building.areadamagetower.AreaDamageTowerBuildingStrategy;
 import com.daruc.towerdefence.building.barracks.BarracksBuildingStrategy;
-import com.daruc.towerdefence.building.boat.Boat;
 import com.daruc.towerdefence.building.boat.BoatBuildingStrategy;
 import com.daruc.towerdefence.building.Building;
 import com.daruc.towerdefence.building.BuildingStrategy;
-import com.daruc.towerdefence.building.castle.Castle;
 import com.daruc.towerdefence.building.icetower.IceTowerBuildingStrategy;
 import com.daruc.towerdefence.building.lasertower.LaserTowerBuildingStrategy;
 import com.daruc.towerdefence.building.powergenerator.PowerGeneratorBuildingStrategy;
@@ -113,88 +114,27 @@ public class MapView extends SurfaceView implements Runnable {
 
         surfaceHolder = getHolder();
 
-        mediaPlayer = MediaPlayer.create(context, R.raw.sound);
-        soundId = soundPool.load(context, R.raw.sound, 1);
+        initSounds(context);
 
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    touchCoordinates.x = event.getX();
-                    touchCoordinates.y = event.getY();
-                }
-                return false;
-            }
-        });
+        setOnTouchListener(new MapViewOnTouchListener(this));
+        setOnClickListener(new MapViewOnClickListener(this));
+        setOnLongClickListener(new MapViewOnLongClickListener(this));
 
-        final MapView thisMapView = this;
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int positionX = (int) (touchCoordinates.x / tileSize);
-                int positionY = (int) (touchCoordinates.y / tileSize);
-                MapPoint mapPoint = new MapPoint(positionX, positionY);
-
-                if (positionX >= gameMap.getWidth() || positionY >= gameMap.getHeight()) {
-                    return;
-                }
-
-                if (selectedBuilding instanceof Boat) {
-                    Boat boat = (Boat) selectedBuilding;
-                    boat.move(mapPoint);
-
-                } else {
-                    BuildingStrategy buildingStrategy =
-                            BuildingSelection.fromIndex(buildingSelectionIdx).getBuildingStrategy();
-
-                    if (buildingStrategy.hasEnoughGold(thisMapView)) {
-                        buildingStrategy.build(thisMapView, mapPoint);
-                    }
-                }
-
-                Building newSelectedBuilding = gameMap.getBuilding(mapPoint);
-                if (newSelectedBuilding == selectedBuilding) {
-                    selectedBuilding = null;
-                } else {
-                    selectedBuilding = gameMap.getBuilding(mapPoint);
-                }
-            }
-        });
-
-        setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int positionX = (int) (touchCoordinates.x / tileSize);
-                int positionY = (int) (touchCoordinates.y / tileSize);
-                MapPoint mapPoint = new MapPoint(positionX, positionY);
-
-                Building building = gameMap.getBuilding(mapPoint);
-                if (building != null && !(building instanceof Castle)) {
-                    int cost = building.getCost() / 2;
-                    if (gold >= cost) {
-                        gameMap.removeBuilding(positionX, positionY);
-                        setGold(gold - cost);
-                    }
-                } else if (building == null &&
-                        gameMap.getGround(positionX, positionY) == GroundType.FOREST) {
-
-                    if (gold >= 100) {
-                        gameMap.removeForest(positionX, positionY);
-                        setGold(gold - 100);
-                    }
-                }
-                return true;
-            }
-        });
-
-        InputStream mapResource = context.getResources().openRawResource(mapId);
-        gameMap = new GameMap(mapResource);
-
-        updateMap = new UpdateMap(this);
-
+        initMap(context, mapId);
         initPaints();
 
         resume();
+    }
+
+    private void initSounds(Context context) {
+        mediaPlayer = MediaPlayer.create(context, R.raw.sound);
+        soundId = soundPool.load(context, R.raw.sound, 1);
+    }
+
+    private void initMap(Context context, int mapId) {
+        InputStream mapResource = context.getResources().openRawResource(mapId);
+        gameMap = new GameMap(mapResource);
+        updateMap = new UpdateMap(this);
     }
 
     private void initPaints() {
@@ -325,6 +265,10 @@ public class MapView extends SurfaceView implements Runnable {
         return selectedBuilding;
     }
 
+    public void setSelectedBuilding(Building building) {
+        selectedBuilding = building;
+    }
+
     public void setBuildingSelectionIndex(int index) {
         buildingSelectionIdx = index;
     }
@@ -395,5 +339,13 @@ public class MapView extends SurfaceView implements Runnable {
         playing = true;
         thread = new Thread(this);
         thread.start();
+    }
+
+    public PointF getTouchCoordinates() {
+        return touchCoordinates;
+    }
+
+    public void setTouchCoordinates(PointF touchCoordinates) {
+        this.touchCoordinates = touchCoordinates;
     }
 }

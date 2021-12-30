@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daruc.towerdefence.building.Upgradable;
+import com.daruc.towerdefence.mapview.MapView;
 
 
 public class GameView extends ViewGroup {
