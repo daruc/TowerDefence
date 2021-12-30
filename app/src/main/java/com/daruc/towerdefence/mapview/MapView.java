@@ -73,42 +73,6 @@ public class MapView extends SurfaceView implements Runnable {
 
     private int buildingSelectionIdx = 0;
 
-    private enum BuildingSelection {
-        ROUND_TOWER(0, new RoundTowerBuildingStrategy()),
-        SQUARE_TOWER(1, new SquareTowerBuildingStrategy()),
-        POWER_GENERATOR(2, new PowerGeneratorBuildingStrategy()),
-        BOAT(3, new BoatBuildingStrategy()),
-        ANTI_TANK_TOWER(4, new AntiTankTowerBuildingStrategy()),
-        BARRACKS(5, new BarracksBuildingStrategy()),
-        ICE_TOWER(6, new IceTowerBuildingStrategy()),
-        VOLCANIC_TOWER(7, new VolcanicTowerBuildingStrategy()),
-        LASER_TOWER(8, new LaserTowerBuildingStrategy()),
-        RADAR(9, new RadarBuildingStrategy()),
-        WALL(10, new WallBuildingStrategy()),
-        AREA_DAMAGE_TOWER(11, new AreaDamageTowerBuildingStrategy());
-
-        int index;
-        BuildingStrategy buildingStrategy;
-
-        BuildingSelection(int idx, BuildingStrategy buildingStrategy)  {
-            index = idx;
-            this.buildingStrategy = buildingStrategy;
-        }
-
-        public static BuildingSelection fromIndex(int idx) {
-            for (BuildingSelection buildingSelection : values()) {
-                if (buildingSelection.index == idx) {
-                    return buildingSelection;
-                }
-            }
-            return null;
-        }
-
-        public BuildingStrategy getBuildingStrategy() {
-            return buildingStrategy;
-        }
-    }
-
     public MapView(Context context, int mapId) {
         super(context);
 
