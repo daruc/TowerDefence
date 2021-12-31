@@ -17,24 +17,40 @@ public class VolcanicTowerBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
-        GameMap gameMap = mapView.getGameMap();
-
-        if (isCorrectPlaceToBuild(gameMap, mapPoint)) {
-
-            VolcanicTower volcanicTower = new VolcanicTower(new PointF(mapPoint.getX() + 0.5f,
-                    mapPoint.getY() + 0.5f));
-
-            gameMap.setBuilding(mapPoint, volcanicTower);
-            mapView.setGold(mapView.getGold() - VolcanicTower.COST);
+        if (isCorrectPlaceToBuild(mapView, mapPoint)) {
+            buildVolcanicTower(mapView, mapPoint);
         }
     }
 
-    public boolean isCorrectPlaceToBuild(GameMap gameMap, MapPoint mapPoint) {
+    public boolean isCorrectPlaceToBuild(MapView mapView, MapPoint mapPoint) {
+        GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
 
         return groundType == GroundType.GRASS &&
                 building == null &&
                 gameMap.isNextToPath(mapPoint);
+    }
+
+    private void buildVolcanicTower(MapView mapView, MapPoint mapPoint) {
+        VolcanicTower volcanicTower = newVolcanicTower(mapPoint);
+        GameMap gameMap = mapView.getGameMap();
+        setNewBuildingOnMap(gameMap, volcanicTower, mapPoint);
+        decreaseGold(mapView);
+    }
+
+    private VolcanicTower newVolcanicTower(MapPoint mapPoint) {
+        return new VolcanicTower(new PointF(mapPoint.getX() + 0.5f,
+                mapPoint.getY() + 0.5f));
+    }
+
+    private void setNewBuildingOnMap(GameMap gameMap, VolcanicTower volcanicTower,
+                                     MapPoint mapPoint) {
+
+        gameMap.setBuilding(mapPoint, volcanicTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - VolcanicTower.COST);
     }
 }

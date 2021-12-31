@@ -92,7 +92,7 @@ public class RoundTowerDrawingStrategy extends BuildingDrawingStrategy {
     }
 
     private void drawBullet(Canvas canvas, int tileSize, Bullet bullet) {
-        PointF bulletPosition = new PointF(bullet.getPosition().x, bullet.getPosition().y);
+        PointF bulletPosition = new PointF(bullet.getMapSpacePosition().x, bullet.getMapSpacePosition().y);
         bulletPosition.x *= tileSize;
         bulletPosition.y *= tileSize;
 

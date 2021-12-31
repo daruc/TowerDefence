@@ -53,22 +53,19 @@ public class UpdateMap {
                     gameMap.getCastle().decreaseHealth(1);
                     if (gameMap.getCastle().getHealth() == 0) {
                         Log.d("GAME", "Castle destroyed");
-                        //Toast.makeText(context, "Defeat", Toast.LENGTH_LONG).show();
                     }
                 }
             }
         }
 
         if (!gameMap.getEnemies().isEmpty() && gameMap.enemiesDead()) {
-            //Toast.makeText(context, "Victory", Toast.LENGTH_LONG).show();
             gameMap.getEnemies().clear();
-            //gameMap.nextWave();
         }
 
         long time = System.currentTimeMillis();
         for (Building building : gameMap.getBuildings()) {
             if (building instanceof RoundTower) {
-                updateTower(time, (RoundTower) building);
+                updateTower(refreshTimeSeconds, (RoundTower) building);
             } else if (building instanceof SquareTower) {
                 updateSquareTower(time, (SquareTower) building);
             } else if (building instanceof Boat) {
@@ -77,33 +74,8 @@ public class UpdateMap {
         }
     }
 
-    private void updateTower(long time, RoundTower roundTower) {
-        roundTower.findEnemies(gameMap.getEnemies());
-        for (Bullet bullet : roundTower.getBullets()) {
-            if (bullet.isFree() && !bullet.hasTarget() && roundTower.hasEnemies() && roundTower.isReady()) {
-                bullet.setTarget(roundTower.getEnemies().get(0));
-                roundTower.setLastShotTime(time);
-            } else if (bullet.hasTarget() && bullet.getTarget().isDead()) {
-                bullet.reset();
-            }
-            bullet.update(refreshTimeSeconds);
-
-            if (bullet.collision()) {
-                Enemy target = bullet.getTarget();
-                target.decreaseHealth(bullet.getDamage());
-                soundPool.play(soundId, 1, 1, 1, 0, 1.0f);
-
-                if (target.isDead()) {
-                    mapView.setGold(mapView.getGold() + 5);
-                }
-                bullet.reset();
-            }
-
-            if (bullet.isOutOfMap(gameMap)) {
-                bullet.reset();
-            }
-
-        }
+    private void updateTower(float deltaSeconds, RoundTower roundTower) {
+        roundTower.update(deltaSeconds);
     }
 
     private void updateSquareTower(long time, SquareTower squareTower) {

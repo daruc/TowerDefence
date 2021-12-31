@@ -19,12 +19,32 @@ public class AntiTankTowerBuildingStrategy implements BuildingStrategy {
         GroundType groundType = mapView.getGameMap().getGround(mapPoint);
         Building building = mapView.getGameMap().getBuilding(mapPoint);
 
-        if (groundType == GroundType.GRASS && building == null) {
-            AntiTankTower antiTankTower =
-                    new AntiTankTower(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
-
-            mapView.getGameMap().setBuilding(mapPoint, antiTankTower);
-            mapView.setGold(mapView.getGold() - AntiTankTower.COST);
+        if (isFreeTile(groundType, building)) {
+            buildAntiTankTower(mapView, mapPoint);
         }
+    }
+
+    private boolean isFreeTile(GroundType groundType, Building building) {
+        return groundType == GroundType.GRASS && building == null;
+    }
+
+    private void buildAntiTankTower(MapView mapView, MapPoint mapPoint) {
+        AntiTankTower antiTankTower = newAntiTankTower(mapPoint);
+        placeNewBuildingOnMap(mapView, mapPoint, antiTankTower);
+        decreaseGold(mapView);
+    }
+
+    private AntiTankTower newAntiTankTower(MapPoint mapPoint) {
+        return new AntiTankTower(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+    }
+
+    private void placeNewBuildingOnMap(MapView mapView, MapPoint mapPoint,
+                                       AntiTankTower antiTankTower) {
+
+        mapView.getGameMap().setBuilding(mapPoint, antiTankTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - AntiTankTower.COST);
     }
 }

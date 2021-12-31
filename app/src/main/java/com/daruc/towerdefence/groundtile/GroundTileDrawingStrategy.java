@@ -3,6 +3,7 @@ package com.daruc.towerdefence.groundtile;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -18,15 +19,15 @@ public abstract class GroundTileDrawingStrategy {
         this.bitmapId = bitmapId;
     }
 
-    public void draw(Canvas canvas, MapView mapView, MapPoint mapPoint) {
+    public void draw(Canvas canvas, MapView mapView, PointF screenPoint) {
         if (bitmap == null) {
             bitmap = BitmapFactory.decodeResource(mapView.getResources(), bitmapId);
         }
 
         float tileSize = mapView.getTileSize();
         Rect source = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        RectF dest = new RectF(mapPoint.getX(), mapPoint.getY(), mapPoint.getX() + tileSize,
-                mapPoint.getY() + tileSize);
+        RectF dest = new RectF(screenPoint.x, screenPoint.y, screenPoint.x + tileSize,
+                screenPoint.y + tileSize);
         canvas.drawBitmap(bitmap, source, dest, null);
     }
 }

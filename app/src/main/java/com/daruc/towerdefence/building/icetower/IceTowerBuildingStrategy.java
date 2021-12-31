@@ -19,16 +19,37 @@ public class IceTowerBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
+
+        if (isCorrectPlaceToBuild(mapView, mapPoint)) {
+            buildIceTower(mapView, mapPoint);
+        }
+    }
+
+    private boolean isCorrectPlaceToBuild(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
 
-        if (groundType == GroundType.GRASS && building == null) {
-            IceTower iceTower = new IceTower(new PointF(mapPoint.getX() + 0.5f,
-                    mapPoint.getY() + 0.5f));
+        return groundType == GroundType.GRASS && building == null;
+    }
 
-            gameMap.setBuilding(mapPoint, iceTower);
-            mapView.setGold(mapView.getGold() - IceTower.COST);
-        }
+    private void buildIceTower(MapView mapView, MapPoint mapPoint) {
+        GameMap gameMap = mapView.getGameMap();
+
+        IceTower iceTower = buildIceTower(mapPoint);
+        placeNewBuildingOnMap(gameMap, iceTower, mapPoint);
+        decreaseGold(mapView);
+    }
+
+    private IceTower buildIceTower(MapPoint mapPoint) {
+        return new IceTower(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+    }
+
+    private void placeNewBuildingOnMap(GameMap gameMap, IceTower iceTower, MapPoint mapPoint) {
+        gameMap.setBuilding(mapPoint, iceTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - IceTower.COST);
     }
 }

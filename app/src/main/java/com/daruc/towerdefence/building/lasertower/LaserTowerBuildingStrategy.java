@@ -17,16 +17,36 @@ public class LaserTowerBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
+        if (isCorrectPlaceToBuild(mapView, mapPoint)) {
+            buildLaserTower(mapView, mapPoint);
+        }
+    }
+
+    private boolean isCorrectPlaceToBuild(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
 
-        if (groundType == GroundType.GRASS && building == null) {
-            LaserTower laserTower = new LaserTower(new PointF(mapPoint.getX() + 0.5f,
-                    mapPoint.getY() + 0.5f));
+        return groundType == GroundType.GRASS && building == null;
+    }
 
-            gameMap.setBuilding(mapPoint, laserTower);
-            mapView.setGold(mapView.getGold() - LaserTower.COST);
-        }
+    private void buildLaserTower(MapView mapView, MapPoint mapPoint) {
+        LaserTower laserTower = newLaserTower(mapPoint);
+        GameMap gameMap = mapView.getGameMap();
+        placeNewBuildingOnMap(gameMap, laserTower, mapPoint);
+        decreaseGold(mapView);
+    }
+
+    private LaserTower newLaserTower(MapPoint mapPoint) {
+        return new LaserTower(new PointF(mapPoint.getX() + 0.5f,
+                mapPoint.getY() + 0.5f));
+    }
+
+    private void placeNewBuildingOnMap(GameMap gameMap, LaserTower laserTower, MapPoint mapPoint) {
+        gameMap.setBuilding(mapPoint, laserTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - LaserTower.COST);
     }
 }

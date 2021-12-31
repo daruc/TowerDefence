@@ -1,32 +1,30 @@
 package com.daruc.towerdefence.building;
 
 import android.graphics.PointF;
-import android.util.Pair;
 
 import com.daruc.towerdefence.Enemy;
 import com.daruc.towerdefence.GameMap;
 import com.daruc.towerdefence.MapDimensions;
-import com.daruc.towerdefence.MapLoader;
 import com.daruc.towerdefence.Vector;
 
 
 public class Bullet {
-    private PointF position;
+    private PointF mapSpacePosition;
     private final PointF towerPosition;
     private PointF direction;
     private Enemy target;
     private boolean free = true;
 
     private int damage = 1;
-    private float speed = 4f;   // map units per second
+    private float speed = 1f;   // map units per second
 
     public Bullet(PointF position) {
         towerPosition = position;
-        this.position = new PointF(position.x, position.y);
+        this.mapSpacePosition = new PointF(position.x, position.y);
     }
 
-    public PointF getPosition() {
-        return position;
+    public PointF getMapSpacePosition() {
+        return mapSpacePosition;
     }
 
     public void update(float deltaTimeSeconds) {
@@ -34,8 +32,8 @@ public class Bullet {
         if (hasTarget()) {
             direction = calculateDirection();
             float displacement = deltaTimeSeconds * speed;
-            position.x += direction.x * displacement;
-            position.y += direction.y * displacement;
+            mapSpacePosition.x += direction.x * displacement;
+            mapSpacePosition.y += direction.y * displacement;
         } else if (!free) {
             moveStraight(deltaTimeSeconds);
         }
@@ -43,14 +41,14 @@ public class Bullet {
 
     private PointF calculateDirection() {
         Vector targetVector = new Vector(target.getPosition());
-        Vector positionVector = new Vector(position);
+        Vector positionVector = new Vector(mapSpacePosition);
         return targetVector.minus(positionVector).getUnitVector().convertToPointF();
     }
 
     public void moveStraight(float deltaTimeSeconds) {
         float displacement = deltaTimeSeconds * speed;
-        position.x += direction.x * displacement;
-        position.y += direction.y * displacement;
+        mapSpacePosition.x += direction.x * displacement;
+        mapSpacePosition.y += direction.y * displacement;
     }
 
     public void setTarget(Enemy enemy) {
@@ -68,13 +66,13 @@ public class Bullet {
 
     public boolean isOutOfMap(GameMap gameMap) {
         MapDimensions mapDimensions = gameMap.mapDimensions();
-        return (position.x < 0f || position.x > mapDimensions.width ||
-                position.y < 0f || position.y > mapDimensions.height);
+        return (mapSpacePosition.x < 0f || mapSpacePosition.x > mapDimensions.width ||
+                mapSpacePosition.y < 0f || mapSpacePosition.y > mapDimensions.height);
     }
 
     public void reset() {
         target = null;
-        position = new PointF(towerPosition.x, towerPosition.y);
+        mapSpacePosition = new PointF(towerPosition.x, towerPosition.y);
         free = true;
     }
 
@@ -88,7 +86,7 @@ public class Bullet {
 
     private float calculateDistance() {
         Vector targetVector = new Vector(target.getPosition());
-        Vector positionVector = new Vector(position);
+        Vector positionVector = new Vector(mapSpacePosition);
         return targetVector.minus(positionVector).length();
     }
 

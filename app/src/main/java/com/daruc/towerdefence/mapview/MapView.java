@@ -42,6 +42,10 @@ import java.io.InputStream;
 
 public class MapView extends SurfaceView implements Runnable {
 
+    private static final int GRID_LINE_COLOR = Color.argb(128, 160, 160, 160);
+    private static final float GRID_LINE_WIDTH = 3.0f;
+    private static final int GOLD_ON_START = 1_000_000;
+
     private Thread thread;
     private volatile boolean playing;
     private Canvas canvas;
@@ -103,8 +107,8 @@ public class MapView extends SurfaceView implements Runnable {
 
     private void initPaints() {
         paintGroundLine = new Paint();
-        paintGroundLine.setColor(Color.argb(128, 160, 160, 160));
-        paintGroundLine.setStrokeWidth(3f);
+        paintGroundLine.setColor(GRID_LINE_COLOR);
+        paintGroundLine.setStrokeWidth(GRID_LINE_WIDTH);
 
         roundTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.round_tower);
         squareTowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.square_tower);
@@ -129,18 +133,16 @@ public class MapView extends SurfaceView implements Runnable {
         for (int h = 0; h < mapHeight; ++h) {
             for (int w = 0; w < mapWidth; ++w) {
                 GroundType groundType = gameMap.getGround(w, h);
-                int tileX = w * tileSize;
-                int tileY = h * tileSize;
-                drawGroundTile(canvas, tileX, tileY, groundType);
+                PointF screenPoint = new PointF(w * tileSize, h * tileSize);
+                drawGroundTile(canvas, screenPoint, groundType);
             }
         }
 
         drawGroundLines(canvas);
     }
 
-    private void drawGroundTile(Canvas canvas, int tileX, int tileY, GroundType type) {
-        MapPoint mapPoint = new MapPoint(tileX, tileY);
-        type.getDrawingStrategy().draw(canvas, this, mapPoint);
+    private void drawGroundTile(Canvas canvas, PointF screenPoint, GroundType type) {
+        type.getDrawingStrategy().draw(canvas, this, screenPoint);
     }
 
     private void drawGroundLines(Canvas canvas) {
@@ -177,7 +179,7 @@ public class MapView extends SurfaceView implements Runnable {
     public void restartGame(Context context) {
         InputStream mapResource = context.getResources().openRawResource(R.raw.map_1);
         gameMap = new GameMap(mapResource);
-        gold = 1_000_000;
+        gold = GOLD_ON_START;
         refreshGoldView();
 
         updateMap.stop();
@@ -265,19 +267,24 @@ public class MapView extends SurfaceView implements Runnable {
     public void run() {
         lastTime = System.currentTimeMillis();
         while (playing) {
-            long deltaTime = System.currentTimeMillis() - lastTime;
-            lastTime = System.currentTimeMillis();
-            if (deltaTime < refreshTime) {
-                try {
-                    Thread.sleep(refreshTime - deltaTime);
-                    deltaTime = refreshTime;
-                } catch (InterruptedException e) {
-                    Log.e("GAME", "Main loop sleep error.", e);
-                }
-            }
+            long deltaTime = calculateDeltaTime();
             updateMap.update(deltaTime);
             draw();
         }
+    }
+
+    private long calculateDeltaTime() {
+        long deltaTime = System.currentTimeMillis() - lastTime;
+        if (deltaTime < refreshTime) {
+            try {
+                Thread.sleep(refreshTime - deltaTime);
+                deltaTime = refreshTime;
+            } catch (InterruptedException e) {
+                Log.e("GAME", "Main loop sleep error.", e);
+            }
+        }
+        lastTime = System.currentTimeMillis();
+        return deltaTime;
     }
 
     private void draw() {

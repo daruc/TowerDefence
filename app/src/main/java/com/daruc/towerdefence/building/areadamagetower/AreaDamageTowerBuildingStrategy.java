@@ -17,17 +17,36 @@ public class AreaDamageTowerBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
+        if (isTileFree(mapView, mapPoint)) {
+            buildAreaDamageTower(mapView, mapPoint);
+        }
+    }
+
+    private boolean isTileFree(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
+        return groundType == GroundType.GRASS && building == null;
+    }
 
-        if (groundType == GroundType.GRASS && building == null) {
+    private void buildAreaDamageTower(MapView mapView, MapPoint mapPoint) {
+        AreaDamageTower areaDamageTower = newAreaDamageTower(mapPoint);
+        placeNewBuildingOnMap(mapView, mapPoint, areaDamageTower);
+        decreaseGold(mapView);
+    }
 
-            AreaDamageTower areaDamageTower
-                    = new AreaDamageTower(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+    private AreaDamageTower newAreaDamageTower(MapPoint mapPoint) {
+        return new AreaDamageTower(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+    }
 
-            gameMap.setBuilding(mapPoint, areaDamageTower);
-            mapView.setGold(mapView.getGold() - AreaDamageTower.COST);
-        }
+    private void placeNewBuildingOnMap(MapView mapView, MapPoint mapPoint,
+                                       AreaDamageTower areaDamageTower) {
+
+        GameMap gameMap = mapView.getGameMap();
+        gameMap.setBuilding(mapPoint, areaDamageTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - AreaDamageTower.COST);
     }
 }

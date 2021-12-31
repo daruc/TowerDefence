@@ -17,14 +17,35 @@ public class WallBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
+        if (isCorrectPlaceToBuild(mapView, mapPoint)) {
+            buildWall(mapView, mapPoint);
+        }
+    }
+
+    private boolean isCorrectPlaceToBuild(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
 
-        if (groundType == GroundType.PATH && building == null) {
-            Wall wall = new Wall(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
-            gameMap.setBuilding(mapPoint, wall);
-            mapView.setGold(mapView.getGold() - Wall.COST);
-        }
+        return groundType == GroundType.PATH && building == null;
+    }
+
+    private void buildWall(MapView mapView, MapPoint mapPoint) {
+        Wall wall = newWall(mapPoint);
+        GameMap gameMap = mapView.getGameMap();
+        placeNewWallOnMap(gameMap, wall, mapPoint);
+        decreaseGold(mapView);
+    }
+
+    private Wall newWall(MapPoint mapPoint) {
+        return new Wall(new PointF(mapPoint.getX() + 0.5f, mapPoint.getY() + 0.5f));
+    }
+
+    private void placeNewWallOnMap(GameMap gameMap, Wall wall, MapPoint mapPoint) {
+        gameMap.setBuilding(mapPoint, wall);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - Wall.COST);
     }
 }

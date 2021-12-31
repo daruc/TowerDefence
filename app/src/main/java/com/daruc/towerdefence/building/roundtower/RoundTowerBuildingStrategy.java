@@ -18,18 +18,37 @@ public class RoundTowerBuildingStrategy implements BuildingStrategy {
 
     @Override
     public void build(MapView mapView, MapPoint mapPoint) {
+        if (isCorrectPlaceToBuild(mapView, mapPoint)) {
+            buildRoundTower(mapView, mapPoint);
+        }
+    }
+
+    private boolean isCorrectPlaceToBuild(MapView mapView, MapPoint mapPoint) {
         GameMap gameMap = mapView.getGameMap();
         GroundType groundType = gameMap.getGround(mapPoint);
         Building building = gameMap.getBuilding(mapPoint);
 
-        if (groundType == GroundType.GRASS && building == null) {
-            RoundTower roundTower = new RoundTower(new PointF(mapPoint.getX() + 0.5f,
-                    mapPoint.getY() + 0.5f));
-            gameMap.setBuilding(mapPoint, roundTower);
-            mapView.setGold(mapView.getGold() - RoundTower.COST);
+        return groundType == GroundType.GRASS && building == null;
+    }
 
-            //PowerGenerator powerGenerator = findPowerGenerator(x, y);
-            //roundTower.setPowerGenerator(powerGenerator);
-        }
+    private void buildRoundTower(MapView mapView, MapPoint mapPoint) {
+        RoundTower roundTower = newRoundTower(mapView, mapPoint);
+        GameMap gameMap = mapView.getGameMap();
+        setNewBuildingOnMap(gameMap, roundTower, mapPoint);
+        decreaseGold(mapView);
+    }
+
+    private RoundTower newRoundTower(MapView mapView, MapPoint mapPoint) {
+        PointF coordinates = new PointF(mapPoint.getX() + 0.5f,
+                mapPoint.getY() + 0.5f);
+        return new RoundTower(mapView, coordinates);
+    }
+
+    private void setNewBuildingOnMap(GameMap gameMap, RoundTower roundTower, MapPoint mapPoint) {
+        gameMap.setBuilding(mapPoint, roundTower);
+    }
+
+    private void decreaseGold(MapView mapView) {
+        mapView.setGold(mapView.getGold() - RoundTower.COST);
     }
 }
